@@ -21,20 +21,25 @@ def ping_pong():
 @github_blueprint.route("/user/signin/callback", methods=["GET"])
 def index():
     code = request.args.get('code')
-    header = {"Content-Type": "application/json",}
+    header = {"Content-Type": "application/json"}
     
     data = {
             "client_id": CLIENT_ID,
             "client_secret": CLIENT_SECRET,
             "code": code
             }
+    scope = "admin:repo_hook,repo"
+    a = "https://github.com/login/oauth/access_token?client_id={client_id}&client_secret={client_secret}&code={code}".format(
+        code=code, client_id=CLIENT_ID, client_secret=CLIENT_SECRET)
     data = json.dumps(data)
-    post = requests.post(url="https://github.com/login/oauth/access_token",
-                         data=data,
+    post = requests.post(url=a,
                          headers=header)
+    # return token
     post_str = str(post.content)
-    post_str = post_str.split("=")[1]
-    access_token = post_str.replace("&scope","")
+    # post_str = post_str.split("=")[1]
+    # access_token = post_str.replace("&scope","")
+    print(post_str, file=sys.stderr)
     #save to db
 
     return jsonify({"message": "success"})
+    # return access_token
