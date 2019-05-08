@@ -28,18 +28,15 @@ class Issue():
             username = response.json()
             return username["login"]
 
-    def create_issue(self, repository_name):
+    def create_issue(self, repository_name, title, body):
 
         username = self.get_github_username()
-        title = "Found a bug"
-        body = "I'm having a problem with this."
-        # assignees = ["caiovfernandes"]
 
         data = {
                 "title": title,
                 "body": body,
                 "assignees": [
-                    "sudjoao"
+                    username
                     ]
                }
         headers = {
