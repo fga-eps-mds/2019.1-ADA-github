@@ -6,7 +6,7 @@ from requests.exceptions import HTTPError
 import json
 
 
-class User():
+class UserInfo():
     def __init__(self, GITHUB_TOKEN):
         self.GITHUB_TOKEN = GITHUB_TOKEN
 

@@ -1,8 +1,9 @@
 from flask import jsonify, Blueprint, redirect, url_for, request
 from flask_cors import CORS
-from github.user.utils import User
+from github.user.utils import UserInfo
 from github.user.error_messages import NOT_FOUND, UNAUTHORIZED
 from requests.exceptions import HTTPError
+from github.data.user import User
 import requests
 import sys
 import json
@@ -21,9 +22,12 @@ def ping_pong():
     }), 200
 
 
-@github_blueprint.route("/user/signin/callback", methods=["GET"])
-def index():
+@github_blueprint.route("/user/callback", methods=["GET"])
+def get_access_token():
     code = request.args.get('code')
+    print("$"*40, file=sys.stderr)
+    print(code, file=sys.stderr)
+    print("$"*40, file=sys.stderr)
     header = {"Accept": "application/json"}
 
     data = {
@@ -37,12 +41,30 @@ def index():
     data = json.dumps(data)
     post = requests.post(url=oauth_user,
                          headers=header)
-    post_str = post.json()
-    GITHUB_TOKEN = post_str['access_token']
+    post_json = post.json()
+    # print(post_json, file=sys.stderr)
+    GITHUB_TOKEN = post_json['access_token']
+    user_info = UserInfo(GITHUB_TOKEN)
+    user_infos = user_info.get_user()
+
+    db_user = User()
+    db_user.access_token = GITHUB_TOKEN
+    db_user.github_user = user_infos
+    db_user.save()
+    print(GITHUB_TOKEN, file=sys.stderr)
+
+    return jsonify({
+        "message": "success"
+    }), 200
+
+
+@github_blueprint.route("/user/<github_username>/repositories", methods=["GET"])
+def get_repositories(github_username):
     try:
-        user = User(GITHUB_TOKEN)
-        username = user.get_user()
-        requested_repos = user.get_repos()
+        db_user = User.objects(github_user=github_username).first()
+        user_repositories = UserInfo(db_user.access_token)
+
+        requested_repos = user_repositories.get_repos()
     except HTTPError as http_error:
         dict_message = json.loads(str(http_error))
         if dict_message["status_code"] == 401:
@@ -53,7 +75,5 @@ def index():
         return jsonify(NOT_FOUND), 404
     else:
         return jsonify(
-            username,
             requested_repos
         ), 200
-
