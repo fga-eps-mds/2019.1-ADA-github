@@ -28,12 +28,12 @@ class UserInfo():
         login = self.get_user()
         response = requests.get('https://api.github.com/users/{login}/repos'.format(login=login), 
                                 headers=headers)
-        repos = response.json()
-        requested_repos = []
-        for i, item in enumerate(repos):
-            repo_data = {"repository": 0}
-            repo_data["repository"] = repos[i]['name']
-            requested_repos.append(repo_data)
+        repository = response.json()
+        requested_repositories = {"repositories": []}
+        for i, item in enumerate(repository):
+            repository_data = {"name": 0}
+            repository_data["name"] = repository[i]['name']
+            requested_repositories["repositories"].append(repository_data)
         
-        return requested_repos
+        return requested_repositories
 

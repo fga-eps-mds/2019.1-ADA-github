@@ -42,7 +42,6 @@ def get_access_token():
     post = requests.post(url=oauth_user,
                          headers=header)
     post_json = post.json()
-    # print(post_json, file=sys.stderr)
     GITHUB_TOKEN = post_json['access_token']
     user_info = UserInfo(GITHUB_TOKEN)
     user_infos = user_info.get_user()
@@ -53,9 +52,10 @@ def get_access_token():
     db_user.save()
     print(GITHUB_TOKEN, file=sys.stderr)
 
-    return jsonify({
-        "message": "success"
-    }), 200
+    return redirect("https://t.me/Ada_a_bot", code=302)
+    # return jsonify({
+    #     "message": "success"
+    # }), 200
 
 
 @github_blueprint.route("/user/<github_username>/repositories", methods=["GET"])
