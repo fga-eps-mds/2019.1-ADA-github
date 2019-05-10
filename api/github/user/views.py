@@ -25,9 +25,7 @@ def ping_pong():
 @github_blueprint.route("/user/callback", methods=["GET"])
 def get_access_token():
     code = request.args.get('code')
-    print("$"*40, file=sys.stderr)
-    print(code, file=sys.stderr)
-    print("$"*40, file=sys.stderr)
+    print(request.args, file=sys.stderr)
     header = {"Accept": "application/json"}
 
     data = {
@@ -48,11 +46,14 @@ def get_access_token():
 
     db_user = User()
     db_user.access_token = GITHUB_TOKEN
-    db_user.github_user = user_infos
+    db_user.github_user = user_infos["github_username"]
+    db_user.github_user_id = str(user_infos["github_user_id"])
+
     db_user.save()
     print(GITHUB_TOKEN, file=sys.stderr)
 
-    return redirect("https://t.me/Ada_a_bot", code=302)
+    redirect_uri = "https://t.me/Ada_Git_Bot?start={github_id}".format(github_id=db_user.github_user_id)
+    return redirect(redirect_uri, code=302)
     # return jsonify({
     #     "message": "success"
     # }), 200
@@ -77,3 +78,17 @@ def get_repositories(github_username):
         return jsonify(
             requested_repos
         ), 200
+
+@github_blueprint.route("/user/<github_id>/<sender_id>", methods=["GET"])
+def save_chat_id(github_id, sender_id):
+    try:
+        user = User.objects(github_user_id=github_id).first()
+        user.chat_id = sender_id
+
+        user.save()
+    except TypeError:
+        print("NOT FOUND", file=sys.stderr)
+    else:
+        return jsonify({
+            "message": "success"
+        }), 200

@@ -18,7 +18,9 @@ class UserInfo():
 
         response = requests.get('https://api.github.com/user', headers=headers)
         requested_user = response.json()
-        return requested_user['login']
+        github_data = {"github_username": requested_user["login"], "github_user_id": requested_user["id"]}
+        print(github_data, file=sys.stderr)
+        return github_data
 
     def get_repos(self):
         headers = {
@@ -26,7 +28,7 @@ class UserInfo():
             "Authorization": "Bearer " + self.GITHUB_TOKEN
         }
         login = self.get_user()
-        response = requests.get('https://api.github.com/users/{login}/repos'.format(login=login), 
+        response = requests.get('https://api.github.com/users/{login}/repos'.format(login=login),
                                 headers=headers)
         repository = response.json()
         requested_repositories = {"repositories": []}
@@ -34,6 +36,5 @@ class UserInfo():
             repository_data = {"name": 0}
             repository_data["name"] = repository[i]['name']
             requested_repositories["repositories"].append(repository_data)
-        
-        return requested_repositories
 
+        return requested_repositories
