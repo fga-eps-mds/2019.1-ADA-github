@@ -20,11 +20,10 @@ class User(mongoengine.Document):
         self.save()
         return self
 
-    def save_github_user_data(self, github_user,
-                              chat_id, github_user_id):
+    def save_github_user_data(self, github_user, github_user_id, chat_id):
         self.github_user = github_user
-        self.chat_id = chat_id
         self.github_user_id = github_user_id
+        self.chat_id = chat_id
         self.save()
         return self
 
