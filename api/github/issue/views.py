@@ -26,7 +26,7 @@ def create_issue(repository_name):
     try:
         r = request.get_json()
         title = r['title']
-        body = r['body']
+        body  = r['body']
         issue = Issue(GITHUB_API_TOKEN)
         create_issue = issue.create_issue(repository_name, title,body)
     except HTTPError as http_error:
@@ -37,5 +37,9 @@ def create_issue(repository_name):
             return jsonify(NOT_FOUND), 404
     else:
         return jsonify(
-            create_issue
+        {
+            "title": create_issue["title"],
+            "body": create_issue["body"],
+            "html_url":create_issue["html_url"]
+        }
         ), 200
