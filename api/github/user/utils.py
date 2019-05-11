@@ -2,8 +2,6 @@
 
 import requests
 import sys
-from requests.exceptions import HTTPError
-import json
 
 
 class UserInfo():
@@ -18,7 +16,8 @@ class UserInfo():
 
         response = requests.get('https://api.github.com/user', headers=headers)
         requested_user = response.json()
-        github_data = {"github_username": requested_user["login"], "github_user_id": requested_user["id"]}
+        github_data = {"github_username": requested_user["login"],
+                       "github_user_id": requested_user["id"]}
         print(github_data, file=sys.stderr)
         return github_data
 
@@ -28,7 +27,8 @@ class UserInfo():
             "Authorization": "Bearer " + self.GITHUB_TOKEN
         }
         login = self.get_user()
-        response = requests.get('https://api.github.com/users/{login}/repos'.format(login=login),
+        response = requests.get("https://api.github.com/users/{login}"
+                                "/repos".format(login=login),
                                 headers=headers)
         repository = response.json()
         requested_repositories = {"repositories": []}

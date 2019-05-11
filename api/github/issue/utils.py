@@ -12,25 +12,7 @@ class Issue():
     #     response = requests.get(
     #         "https://api.github.com/orgs/:org/issues")
 
-    def get_github_username(self):
-        headers = {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer " + self.GITHUB_API_TOKEN
-        }
-        try:
-            response = requests.get("https://api.github.com/user",
-                                    headers=headers)
-            response.raise_for_status()
-        except HTTPError as http_error:
-            dict_error = {"status_code": http_error.response.status_code}
-            raise HTTPError(json.dumps(dict_error))
-        else:
-            username = response.json()
-            return username["login"]
-
-    def create_issue(self, repository_name, title, body):
-
-        username = self.get_github_username()
+    def create_issue(self, repository_name, username, title, body):
 
         data = {
                 "title": title,
@@ -57,4 +39,7 @@ class Issue():
             raise HTTPError(json.dumps(dict_error))
         else:
             created_issue = response.json()
-            return created_issue
+            issue_dict = {"title": created_issue["title"],
+                          "body": created_issue["body"],
+                          "html_url": created_issue["html_url"]}
+            return issue_dict

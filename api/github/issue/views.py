@@ -3,10 +3,8 @@ from flask_cors import CORS
 from github.issue.utils import Issue
 import json
 from github.issue.error_messages import NOT_FOUND, UNAUTHORIZED
-import requests
 from requests.exceptions import HTTPError
 import os
-from github.issue.utils import Issue
 from github.data.user import User
 from github.data.project import Project
 
@@ -33,20 +31,23 @@ def create_issue(chat_id):
         user = User()
         user = User.objects(chat_id=chat_id).first()
         project = Project()
-        project = user.project   
+        project = user.project
         issue = Issue(GITHUB_API_TOKEN)
-        create_issue = issue.create_issue(project.name, title, body)
+        create_issue = issue.create_issue(project.name, user.github_user,
+                                          title, body)
     except HTTPError as http_error:
         dict_message = json.loads(str(http_error))
         if dict_message["status_code"] == 401:
             return jsonify(UNAUTHORIZED), 401
         else:
             return jsonify(NOT_FOUND), 404
+    except AttributeError:
+        return jsonify(NOT_FOUND), 404
     else:
         return jsonify(
-        {
+         {
             "title": create_issue["title"],
             "body": create_issue["body"],
-            "html_url":create_issue["html_url"]
-        }
+            "html_url": create_issue["html_url"]
+         }
         ), 200
