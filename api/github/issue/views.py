@@ -44,5 +44,9 @@ def create_issue(chat_id):
             return jsonify(NOT_FOUND), 404
     else:
         return jsonify(
-            create_issue
+        {
+            "title": create_issue["title"],
+            "body": create_issue["body"],
+            "html_url":create_issue["html_url"]
+        }
         ), 200
