@@ -17,6 +17,8 @@ services:
       - DB_URL=${DB_URL}
       - GITHUB_OAUTH_CLIENT_ID=${GITHUB_OAUTH_CLIENT_ID}
       - GITHUB_OAUTH_CLIENT_SECRET=${GITHUB_OAUTH_CLIENT_SECRET}
+      - ACCESS_TOKEN=${ACCESS_TOKEN}
+      - BOT_NAME=${BOT_NAME}
       - FLASK_APP=github/__init__.py
       - FLASK_ENV=development
       - APP_SETTINGS=github.config.DevelopmentConfig

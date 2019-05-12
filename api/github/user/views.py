@@ -12,6 +12,8 @@ import os
 github_blueprint = Blueprint("github", __name__)
 CLIENT_ID = os.environ.get("GITHUB_OAUTH_CLIENT_ID", "")
 CLIENT_SECRET = os.environ.get("GITHUB_OAUTH_CLIENT_SECRET", "")
+BOT_NAME = os.environ.get("BOT_NAME", "")
+ACCESS_TOKEN = os.environ.get("ACCESS_TOKEN", "")
 CORS(github_blueprint)
 
 @github_blueprint.route("/user/ping", methods=["GET"])
@@ -22,10 +24,10 @@ def ping_pong():
     }), 200
 
 
-@github_blueprint.route("/user/callback", methods=["GET"])
-def get_access_token():
+@github_blueprint.route("/user/github/authorize/<chat_id>", methods=["GET"])
+def get_access_token(chat_id):
     code = request.args.get('code')
-    print(request.args, file=sys.stderr)
+
     header = {"Accept": "application/json"}
 
     data = {
@@ -41,22 +43,19 @@ def get_access_token():
                          headers=header)
     post_json = post.json()
     GITHUB_TOKEN = post_json['access_token']
-    user_info = UserInfo(GITHUB_TOKEN)
-    user_infos = user_info.get_user()
+    user = UserInfo(GITHUB_TOKEN)
+    user_infos = user.get_user()
 
     db_user = User()
     db_user.access_token = GITHUB_TOKEN
     db_user.github_user = user_infos["github_username"]
     db_user.github_user_id = str(user_infos["github_user_id"])
-
+    db_user.chat_id = str(chat_id)
     db_user.save()
-    print(GITHUB_TOKEN, file=sys.stderr)
+    user.send_message(ACCESS_TOKEN, chat_id)
 
-    redirect_uri = "https://t.me/Ada_Git_Bot?start={github_id}".format(github_id=db_user.github_user_id)
+    redirect_uri = "https://t.me/{bot_name}".format(bot_name=BOT_NAME)
     return redirect(redirect_uri, code=302)
-    # return jsonify({
-    #     "message": "success"
-    # }), 200
 
 
 @github_blueprint.route("/user/<github_username>/repositories", methods=["GET"])
@@ -78,17 +77,3 @@ def get_repositories(github_username):
         return jsonify(
             requested_repos
         ), 200
-
-@github_blueprint.route("/user/<github_id>/<sender_id>", methods=["GET"])
-def save_chat_id(github_id, sender_id):
-    try:
-        user = User.objects(github_user_id=github_id).first()
-        user.chat_id = sender_id
-
-        user.save()
-    except TypeError:
-        print("NOT FOUND", file=sys.stderr)
-    else:
-        return jsonify({
-            "message": "success"
-        }), 200

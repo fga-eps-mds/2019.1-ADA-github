@@ -4,6 +4,8 @@ import requests
 import sys
 from requests.exceptions import HTTPError
 import json
+import telegram
+import os
 
 
 class UserInfo():
@@ -19,7 +21,6 @@ class UserInfo():
         response = requests.get('https://api.github.com/user', headers=headers)
         requested_user = response.json()
         github_data = {"github_username": requested_user["login"], "github_user_id": requested_user["id"]}
-        print(github_data, file=sys.stderr)
         return github_data
 
     def get_repos(self):
@@ -36,5 +37,10 @@ class UserInfo():
             repository_data = {"name": 0}
             repository_data["name"] = repository[i]['name']
             requested_repositories["repositories"].append(repository_data)
-
         return requested_repositories
+
+    def send_message(self, token, chat_id):
+        access_token = os.environ.get("ACCESS_TOKEN", "")
+        bot = telegram.Bot(token=access_token)
+        bot.send_message(chat_id=chat_id,
+                         text="Você foi cadastrado com sucesso")
