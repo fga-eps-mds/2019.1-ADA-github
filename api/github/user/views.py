@@ -43,8 +43,10 @@ def get_access_token(chat_id):
                          headers=header)
     post_json = post.json()
     GITHUB_TOKEN = post_json['access_token']
+    print(GITHUB_TOKEN, file=sys.stderr)
     user = UserInfo(GITHUB_TOKEN)
     user_infos = user.get_user()
+
 
     db_user = User()
     db_user.access_token = GITHUB_TOKEN
@@ -77,3 +79,26 @@ def get_repositories(github_username):
         return jsonify(
             requested_repos
         ), 200
+
+@github_blueprint.route("/user/<chat_id>", methods=["GET"])
+def get_github_login(chat_id):
+    try:
+        db_user = User.objects(github_user=chat_id).first()
+        user_login = UserInfo(db_user.access_token)
+
+        requested_login = user_login.get_user()
+        print(requested_login, file=sys.stderr)
+        github_username = requested_login["github_username"]
+    except HTTPError as http_error:
+        dict_message = json.loads(str(http_error))
+        if dict_message["status_code"] == 401:
+            return jsonify(UNAUTHORIZED), 401
+        else:
+            return jsonify(NOT_FOUND), 404
+    except AttributeError:
+        return jsonify(NOT_FOUND), 404
+    else:
+        return jsonify(
+            github_username
+        ), 200
+

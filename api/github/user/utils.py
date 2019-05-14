@@ -17,7 +17,6 @@ class UserInfo():
             "Content-Type": "applications/json",
             "Authorization": "Bearer " + self.GITHUB_TOKEN
         }
-
         response = requests.get('https://api.github.com/user', headers=headers)
         requested_user = response.json()
         github_data = {"github_username": requested_user["login"], "github_user_id": requested_user["id"]}
@@ -28,7 +27,8 @@ class UserInfo():
             "Content-Type": "applications/json",
             "Authorization": "Bearer " + self.GITHUB_TOKEN
         }
-        login = self.get_user()
+        github_username = self.get_user()
+        login = github_username["github_username"]
         response = requests.get('https://api.github.com/users/{login}/repos'.format(login=login),
                                 headers=headers)
         repository = response.json()
