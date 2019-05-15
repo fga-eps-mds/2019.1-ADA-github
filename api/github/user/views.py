@@ -4,6 +4,7 @@ from github.user.utils import UserInfo
 from github.user.error_messages import NOT_FOUND, UNAUTHORIZED
 from requests.exceptions import HTTPError
 from github.data.user import User
+import telegram
 import requests
 import sys
 import json
@@ -56,8 +57,14 @@ def get_access_token(chat_id):
     db_user.save()
     user.send_message(ACCESS_TOKEN, chat_id)
 
-    redirect_uri = "https://t.me/{bot_name}".format(bot_name=BOT_NAME)
-    return redirect(redirect_uri, code=302)
+    bot = telegram.Bot(token=ACCESS_TOKEN)
+    repo_names = user.select_repos_by_buttons(user)
+    reply_markup = telegram.InlineKeyboardMarkup(repo_names)
+    bot.send_message(chat_id=chat_id,
+                             text="Encontrei esses repositórios na sua "
+                                  "conta. Qual você quer que eu "
+                                  "monitore? Clica nele!",
+                             reply_markup=reply_markup)
 
 
 @github_blueprint.route("/user/<github_username>/repositories", methods=["GET"])
@@ -96,6 +103,6 @@ def get_github_login(chat_id):
         return jsonify(NOT_FOUND), 404
     else:
         return jsonify({
-                "username": username
-                }), 200
+            "username": username
+        }), 200
 

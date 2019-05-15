@@ -3,6 +3,7 @@
 import requests
 import sys
 from requests.exceptions import HTTPError
+from github.data.user import User
 import json
 import telegram
 import os
@@ -44,3 +45,12 @@ class UserInfo():
         bot = telegram.Bot(token=access_token)
         bot.send_message(chat_id=chat_id,
                          text="Você foi cadastrado com sucesso")
+    def select_repos_by_buttons(self, user):
+        received_repos = user.get_repos()
+        buttons = []
+        for repositorio in received_repos["repositories"]:
+            buttons.append(telegram.InlineKeyboardButton(
+                    text=repositorio["name"],
+                    callback_data="meu repositorio do github é " + repositorio["name"]))
+        repo_names = [buttons[i:i+2] for i in range(0, len(buttons), 2)]
+        return repo_names
