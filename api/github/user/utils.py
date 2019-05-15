@@ -41,10 +41,13 @@ class UserInfo():
         return requested_repositories
 
     def send_message(self, token, chat_id):
+        github_username = self.get_user()
+        login = github_username["github_username"]
         access_token = os.environ.get("ACCESS_TOKEN", "")
         bot = telegram.Bot(token=access_token)
         bot.send_message(chat_id=chat_id,
-                         text="Você foi cadastrado com sucesso")
+                         text="Você foi cadastrado com sucesso, {user}".format(user=login))
+
     def select_repos_by_buttons(self, user):
         received_repos = user.get_repos()
         buttons = []

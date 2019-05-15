@@ -56,16 +56,16 @@ def get_access_token(chat_id):
     db_user.chat_id = str(chat_id)
     db_user.save()
     user.send_message(ACCESS_TOKEN, chat_id)
-
+    redirect_uri = "https://t.me/{bot_name}".format(bot_name=BOT_NAME)
     bot = telegram.Bot(token=ACCESS_TOKEN)
     repo_names = user.select_repos_by_buttons(user)
     reply_markup = telegram.InlineKeyboardMarkup(repo_names)
     bot.send_message(chat_id=chat_id,
-                             text="Encontrei esses repositórios na sua "
-                                  "conta. Qual você quer que eu "
-                                  "monitore? Clica nele!",
-                             reply_markup=reply_markup)
-
+                         text="Encontrei esses repositórios na sua "
+                         "conta. Qual você quer que eu "
+                         "monitore? Clica nele!",
+                         reply_markup=reply_markup)
+    return redirect(redirect_uri, code=302)
 
 @github_blueprint.route("/user/<github_username>/repositories", methods=["GET"])
 def get_repositories(github_username):
