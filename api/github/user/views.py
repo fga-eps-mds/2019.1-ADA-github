@@ -83,12 +83,9 @@ def get_repositories(github_username):
 @github_blueprint.route("/user/<chat_id>", methods=["GET"])
 def get_github_login(chat_id):
     try:
-        db_user = User.objects(github_user=chat_id).first()
-        user_login = UserInfo(db_user.access_token)
-
-        requested_login = user_login.get_user()
-        print(requested_login, file=sys.stderr)
-        github_username = requested_login["github_username"]
+        db_user = User.objects(chat_id=chat_id).first()
+        username = db_user.github_user
+        print(username, file=sys.stderr)
     except HTTPError as http_error:
         dict_message = json.loads(str(http_error))
         if dict_message["status_code"] == 401:
@@ -98,7 +95,7 @@ def get_github_login(chat_id):
     except AttributeError:
         return jsonify(NOT_FOUND), 404
     else:
-        return jsonify(
-            github_username
-        ), 200
+        return jsonify({
+                "username": username
+                }), 200
 
