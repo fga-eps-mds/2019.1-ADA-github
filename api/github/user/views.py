@@ -44,17 +44,21 @@ def get_access_token(chat_id):
                          headers=header)
     post_json = post.json()
     GITHUB_TOKEN = post_json['access_token']
-    print(GITHUB_TOKEN, file=sys.stderr)
-    user = UserInfo(GITHUB_TOKEN)
-    user_infos = user.get_user()
 
-
-    db_user = User()
-    db_user.access_token = GITHUB_TOKEN
-    db_user.github_user = user_infos["github_username"]
-    db_user.github_user_id = str(user_infos["github_user_id"])
-    db_user.chat_id = str(chat_id)
-    db_user.save()
+    existing_user = User.objects(chat_id=chat_id).first()
+    if not existing_user:
+        db_user = User()
+        db_user.access_token = GITHUB_TOKEN
+        db_user.chat_id = str(chat_id)
+        user = UserInfo(GITHUB_TOKEN)
+        user_infos = user.get_user()
+        db_user.github_user = user_infos["github_username"]
+        db_user.github_user_id = str(user_infos["github_user_id"])
+        db_user.save()
+    else:
+        existing_user.update(access_token=GITHUB_TOKEN)
+        user = UserInfo(GITHUB_TOKEN)
+        user_infos = user.get_user() 
     user.send_message(ACCESS_TOKEN, chat_id)
     redirect_uri = "https://t.me/{bot_name}".format(bot_name=BOT_NAME)
     bot = telegram.Bot(token=ACCESS_TOKEN)
@@ -62,7 +66,7 @@ def get_access_token(chat_id):
     reply_markup = telegram.InlineKeyboardMarkup(repo_names)
     bot.send_message(chat_id=chat_id,
                          text="Encontrei esses repositórios na sua "
-                         "conta. Qual você quer que eu "
+                         "conta do GitHub. Qual você quer que eu "
                          "monitore? Clica nele!",
                          reply_markup=reply_markup)
     return redirect(redirect_uri, code=302)

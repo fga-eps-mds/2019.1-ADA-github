@@ -48,7 +48,7 @@ class UserInfo():
         access_token = os.environ.get("ACCESS_TOKEN", "")
         bot = telegram.Bot(token=access_token)
         bot.send_message(chat_id=chat_id,
-                         text="Você foi cadastrado com sucesso, {user}".format(user=login))
+                         text="Você foi cadastrado com sucesso no GitHub, {user}".format(user=login))
 
     def select_repos_by_buttons(self, user):
         received_repos = user.get_repos()
