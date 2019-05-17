@@ -106,3 +106,21 @@ def get_github_login(chat_id):
             "username": username
         }), 200
 
+@github_blueprint.route("/user/repo", methods=["POST"])
+def register_repository():
+    repo_data = request.get_json()
+    repo_name = repo_data
+    try:
+        db_user = User()
+        user_repositories = UserInfo(db_user.access_token)
+        user_repositories.register_repo(repo_name)
+    except HTTPError as http_error:
+        dict_message = json.loads(str(http_error))
+        return jsonify(dict_message), 400
+    except AttributeError as attribute_error:
+        dict_message = json.loads(str(attribute_error))
+        return jsonify(dict_message), 400
+    else:
+        return jsonify({
+            "status": "OK"
+        }), 200

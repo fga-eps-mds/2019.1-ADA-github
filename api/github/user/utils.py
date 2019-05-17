@@ -4,6 +4,7 @@ import requests
 import sys
 from requests.exceptions import HTTPError
 from github.data.user import User
+from github.data.project import Project
 import json
 import telegram
 import os
@@ -38,6 +39,7 @@ class UserInfo():
             repository_data = {"name": 0}
             repository_data["name"] = repository[i]['name']
             requested_repositories["repositories"].append(repository_data)
+        print(requested_repositories["repositories"])
         return requested_repositories
 
     def send_message(self, token, chat_id):
@@ -57,3 +59,18 @@ class UserInfo():
                     callback_data="meu repositorio do github é " + repositorio["name"]))
         repo_names = [buttons[i:i+2] for i in range(0, len(buttons), 2)]
         return repo_names
+
+    def register_repo(self, repo_json):
+        project_name = repo_json["repository_name"]
+        chat_id = repo_json["chat_id"]
+
+        user = User.objects(chat_id=chat_id).first()
+        try:
+            project = Project()
+            project.save_repository_infos(user, project_name)
+            user.save_github_repo_data(project)
+        except AttributeError:
+            dict_error = {"message":
+                          "Tive um erro tentando cadastrar seu repositório. "
+                          "Mais tarde você tenta. Ok?"}
+            raise AttributeError(json.dumps(dict_error))
