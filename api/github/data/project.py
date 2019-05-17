@@ -3,7 +3,7 @@ from github.data import init_db
 
 
 class Project(mongoengine.Document):
-    user_id = mongoengine.ObjectIdField(required=True)
+    user_id = mongoengine.ObjectIdField(required=False)
     description = mongoengine.StringField(max_length=100)
     name = mongoengine.StringField(max_length=100)
     svn_url = mongoengine.URLField()
@@ -26,9 +26,8 @@ class Project(mongoengine.Document):
         self.save()
         return self
 
-    def save_webhook_infos(self, user, name, project_id):
+    def save_repository_infos(self, user, name):
         self.user_id = user.id
         self.name = name
-        self.project_id = project_id
         self.save()
         return self

@@ -5,8 +5,8 @@ from github.data.project import Project
 
 class User(mongoengine.Document):
     init_db()
-    access_token = mongoengine.StringField(max_length=100)
     project = mongoengine.ReferenceField(Project)
+    access_token = mongoengine.StringField(max_length=100)
     github_user = mongoengine.StringField(max_length=100)
     chat_id = mongoengine.StringField(max_length=100)
     github_user_id = mongoengine.StringField(max_length=100)
