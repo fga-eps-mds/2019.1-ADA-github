@@ -5,12 +5,8 @@ import json
 
 class Issue():
 
-    def __init__(self, GITHUB_API_TOKEN):
-        self.GITHUB_API_TOKEN = GITHUB_API_TOKEN
-
-    # def get_list_issues(self, project_org, project_name):
-    #     response = requests.get(
-    #         "https://api.github.com/orgs/:org/issues")
+    def __init__(self, GITHUB_TOKEN):
+        self.GITHUB_TOKEN = GITHUB_TOKEN
 
     def create_issue(self, repository_name, username, title, body):
 
@@ -23,7 +19,7 @@ class Issue():
                }
         headers = {
             "Content-Type": "application/json",
-            "Authorization": "Bearer " + self.GITHUB_API_TOKEN
+            "Authorization": "Bearer " + self.GITHUB_TOKEN
         }
         try:
             response = requests.post(
