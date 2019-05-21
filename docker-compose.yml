@@ -8,13 +8,14 @@ services:
       dockerfile: ./docker/dev.Dockerfile
     volumes:
       - './api:/usr/src/app'
-    networks: 
+    networks:
       - 20191-ada_adanetwork
     ports:
       - 5015:5000
     environment:
       - DB_NAME=${DB_NAME}
       - DB_URL=${DB_URL}
+      - GITHUB_API_TOKEN=${GITHUB_API_TOKEN}
       - GITHUB_OAUTH_CLIENT_ID=${GITHUB_OAUTH_CLIENT_ID}
       - GITHUB_OAUTH_CLIENT_SECRET=${GITHUB_OAUTH_CLIENT_SECRET}
       - ACCESS_TOKEN=${ACCESS_TOKEN}
@@ -27,7 +28,7 @@ services:
     command: mongod --port 27009
     volumes:
       - /mongo_github:/data/db
-    networks: 
+    networks:
       - 20191-ada_adanetwork
     ports:
       - 27009:27009

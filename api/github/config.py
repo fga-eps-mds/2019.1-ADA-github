@@ -4,6 +4,7 @@ import os
 DB_NAME = os.environ.get("DB_NAME", "")
 DB_URL = os.environ.get("DB_URL", "")
 
+
 class BaseConfig:
     """Base configuration"""
     TESTING = False
