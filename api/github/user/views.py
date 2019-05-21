@@ -1,4 +1,4 @@
-from flask import jsonify, Blueprint, redirect, url_for, request
+from flask import jsonify, Blueprint, redirect, request
 from flask_cors import CORS
 from github.user.utils import UserInfo
 from github.user.error_messages import NOT_FOUND, UNAUTHORIZED
@@ -10,12 +10,14 @@ import sys
 import json
 import os
 
+
 github_blueprint = Blueprint("github", __name__)
 CLIENT_ID = os.environ.get("GITHUB_OAUTH_CLIENT_ID", "")
 CLIENT_SECRET = os.environ.get("GITHUB_OAUTH_CLIENT_SECRET", "")
 BOT_NAME = os.environ.get("BOT_NAME", "")
 ACCESS_TOKEN = os.environ.get("ACCESS_TOKEN", "")
 CORS(github_blueprint)
+
 
 @github_blueprint.route("/user/ping", methods=["GET"])
 def ping_pong():
@@ -36,9 +38,13 @@ def get_access_token(chat_id):
         "client_secret": CLIENT_SECRET,
         "code": code
     }
-    scope = "admin:repo_hook,repo"
-    oauth_user = "https://github.com/login/oauth/access_token?client_id={client_id}&client_secret={client_secret}&code={code}".format(
-        code=code, client_id=CLIENT_ID, client_secret=CLIENT_SECRET)
+
+    oauth_user = ("https://github.com/login/oauth/access_token?client_id"
+                  "={client_id}&client_secret={client_secret}"
+                  "&code={code}".format(
+                                  code=code,
+                                  client_id=CLIENT_ID,
+                                  client_secret=CLIENT_SECRET))
     data = json.dumps(data)
     post = requests.post(url=oauth_user,
                          headers=header)
@@ -71,7 +77,8 @@ def get_access_token(chat_id):
                          reply_markup=reply_markup)
     return redirect(redirect_uri, code=302)
 
-@github_blueprint.route("/user/<github_username>/repositories", methods=["GET"])
+@github_blueprint.route("/user/<github_username>/repositories",
+                        methods=["GET"])
 def get_repositories(github_username):
     try:
         db_user = User.objects(github_user=github_username).first()
