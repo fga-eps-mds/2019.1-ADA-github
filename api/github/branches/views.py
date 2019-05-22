@@ -18,7 +18,7 @@ def ping_pong():
     }), 200
 
 
-@branches_blueprint.route("/branches/<chat_id>", methods=["GET"])
+@branches_blueprint.route("/branches/names/<chat_id>", methods=["GET"])
 def get_branches(chat_id):
     user = User.objects(chat_id=chat_id).first()
     project = user.project
@@ -26,4 +26,15 @@ def get_branches(chat_id):
     branches_names = branch.get_branches_names(project.name, user.github_user)
     return jsonify(
         branches_names
+        ), 200
+
+@branches_blueprint.route("/branches/datecommits/<chat_id>", methods=["GET"])
+def get_commits_dates(chat_id):
+    user = User.objects(chat_id=chat_id).first()
+    project = user.project
+    branch = Branch(user.access_token)
+    commits_date = branch.get_date_last_commit_branches(project.name,
+                                                        user.github_user)
+    return jsonify(
+        commits_date
         ), 200
