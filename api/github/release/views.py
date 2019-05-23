@@ -1,17 +1,16 @@
 from flask import jsonify, Blueprint
 from flask_cors import CORS
-from github.pull_request.utils import PullRequest
+from github.release.utils import Release
 from github.data.user import User
-from github.pull_request.error_messages import NOT_FOUND, UNAUTHORIZED
+from github.release.error_messages import NOT_FOUND, UNAUTHORIZED
 from requests.exceptions import HTTPError
 import json
 
+release_blueprint = Blueprint("release", __name__)
+CORS(release_blueprint)
 
-pull_request_blueprint = Blueprint("pull_request", __name__)
-CORS(pull_request_blueprint)
 
-
-@pull_request_blueprint.route("/pullrequest/ping", methods=["GET"])
+@release_blueprint.route("/release/ping", methods=["GET"])
 def ping_pong():
     return jsonify({
         "status": "success",
@@ -19,14 +18,14 @@ def ping_pong():
     }), 200
 
 
-@pull_request_blueprint.route("/pullrequest/<chat_id>", methods=["GET"])
-def get_pull_request(chat_id):
+@release_blueprint.route("/release/<chat_id>", methods=["GET"])
+def get_releases(chat_id):
     try:
         user = User.objects(chat_id=chat_id).first()
         project = user.project
-        pull_request = PullRequest(user.access_token)
-        pull_request_data = pull_request.get_pull_requests(user.github_user,
-                                                           project.name)
+        release = Release(user.access_token)
+        release_data = release.get_last_release(user.github_user,
+                                                project.name)
     except HTTPError as http_error:
         dict_message = json.loads(str(http_error))
         if dict_message["status_code"] == 401:
@@ -37,5 +36,5 @@ def get_pull_request(chat_id):
         return jsonify(NOT_FOUND), 404
     else:
         return jsonify(
-            pull_request_data
+            release_data
             ), 200
