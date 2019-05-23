@@ -4,13 +4,11 @@ from github.issue.utils import Issue
 import json
 from github.issue.error_messages import NOT_FOUND, UNAUTHORIZED
 from requests.exceptions import HTTPError
-import os
 from github.data.user import User
 from github.data.project import Project
 
 issue_blueprint = Blueprint("issue", __name__)
 CORS(issue_blueprint)
-GITHUB_API_TOKEN = os.getenv("GITHUB_API_TOKEN", "")
 
 
 @issue_blueprint.route("/issue/ping", methods=["GET"])
@@ -20,8 +18,8 @@ def ping_pong():
         "message": "pong!"
     }), 200
 
-@issue_blueprint.route("/api/new_issue/<chat_id>",
-                       methods=["POST"])
+
+@issue_blueprint.route("/api/new_issue/<chat_id>", methods=["POST"])
 def create_issue(chat_id):
     try:
         response = request.get_json()
@@ -32,7 +30,7 @@ def create_issue(chat_id):
         user = User.objects(chat_id=chat_id).first()
         project = Project()
         project = user.project
-        issue = Issue(GITHUB_API_TOKEN)
+        issue = Issue(user.access_token)
         create_issue = issue.create_issue(project.name, user.github_user,
                                           title, body)
     except HTTPError as http_error:

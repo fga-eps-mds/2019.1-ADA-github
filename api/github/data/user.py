@@ -16,7 +16,7 @@ class User(mongoengine.Document):
     }
 
     def create_user(self, username: str):
-        self.username = username
+        self.github_user = username
         self.save()
         return self
 
