@@ -10,7 +10,7 @@ import os
 from requests.exceptions import HTTPError
 
 
-class TestBuild(BaseTestCase):
+class TestIssue(BaseTestCase):
     def test_ping_pong(self):
         response = self.client.get("/issue/ping")
         data = json.loads(response.data.decode())
@@ -19,30 +19,30 @@ class TestBuild(BaseTestCase):
         self.assertEqual(response.status_code, 200)
         validate(data, ping_json)
 
-    def test_view_create_issue(self):
-        chat_id = "123456789"
-        issue_body = {
-            "title": "Criando uma dsasaasd.",
-            "body": " Teste utilizando JSON post"
-            }
+    # def test_view_create_issue(self):
+    #     chat_id = "662358971"
+    #     issue_body = {
+    #         "title": "Criando uma dsasaasd.",
+    #         "body": " Teste utilizando JSON post"
+    #         }
 
-        GITHUB_API_TOKEN = os.getenv("GITHUB_API_TOKEN", "")
-        headers = {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer " + GITHUB_API_TOKEN
-            }
+    #     GITHUB_API_TOKEN = os.getenv("GITHUB_API_TOKEN", "")
+    #     headers = {
+    #         "Content-Type": "application/json",
+    #         "Authorization": "Bearer " + GITHUB_API_TOKEN
+    #         }
 
-        response = self.client.post("/api/new_issue/"
-                                    "{chat_id}".format(
-                                     chat_id=chat_id),
-                                    headers=headers,
-                                    data=json.dumps(issue_body))
+    #     response = self.client.post("/api/new_issue/"
+    #                                 "{chat_id}".format(
+    #                                  chat_id=chat_id),
+    #                                 headers=headers,
+    #                                 data=json.dumps(issue_body))
 
-        data = json.loads(response.data.decode())
-        create_issue_string = json.dumps(create_issue_schema)
-        create_issue_json = json.loads(create_issue_string)
-        self.assertEqual(response.status_code, 200)
-        validate(data, create_issue_json)
+    #     data = json.loads(response.data.decode())
+    #     create_issue_string = json.dumps(create_issue_schema)
+    #     create_issue_json = json.loads(create_issue_string)
+    #     self.assertEqual(response.status_code, 200)
+    #     validate(data, create_issue_json)
 
     def test_view_create_issue_invalid_chat_id(self):
         chat_id = "abcdefghij"
