@@ -64,17 +64,17 @@ def get_access_token(chat_id):
     else:
         existing_user.update(access_token=GITHUB_TOKEN)
         user = UserInfo(GITHUB_TOKEN)
-        user_infos = user.get_user() 
+        user_infos = user.get_user()
     user.send_message(ACCESS_TOKEN, chat_id)
     redirect_uri = "https://t.me/{bot_name}".format(bot_name=BOT_NAME)
     bot = telegram.Bot(token=ACCESS_TOKEN)
     repo_names = user.select_repos_by_buttons(user)
     reply_markup = telegram.InlineKeyboardMarkup(repo_names)
     bot.send_message(chat_id=chat_id,
-                         text="Encontrei esses repositórios na sua "
-                         "conta do GitHub. Qual você quer que eu "
-                         "monitore? Clica nele!",
-                         reply_markup=reply_markup)
+                     text="Encontrei esses repositórios na sua "
+                     "conta do GitHub. Qual você quer que eu "
+                     "monitore? Clica nele!",
+                     reply_markup=reply_markup)
     redirect_uri = "https://t.me/Ada_Git_Bot?start={github_id}".format(
         github_id=db_user.github_user_id)
     return redirect(redirect_uri, code=302)
@@ -100,6 +100,7 @@ def get_repositories(github_username):
             requested_repos
         ), 200
 
+
 @github_blueprint.route("/user/<chat_id>", methods=["GET"])
 def get_github_login(chat_id):
     try:
@@ -118,6 +119,7 @@ def get_github_login(chat_id):
         return jsonify({
             "username": username
         }), 200
+
 
 @github_blueprint.route("/user/repo", methods=["POST"])
 def register_repository():

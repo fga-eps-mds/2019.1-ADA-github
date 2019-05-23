@@ -1,8 +1,5 @@
 import requests
 import sys
-from requests.exceptions import HTTPError
-import json
-from github.branches.error_messages import UNAUTHORIZED, NOT_FOUND
 
 
 class Branch():

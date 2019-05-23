@@ -1,10 +1,8 @@
-from flask import jsonify, Blueprint, redirect, request
+from flask import jsonify, Blueprint
 from flask_cors import CORS
 from github.branches.utils import Branch
-from github.user.error_messages import NOT_FOUND, UNAUTHORIZED
-from requests.exceptions import HTTPError
 from github.data.user import User
-import sys
+
 
 branches_blueprint = Blueprint("branches", __name__)
 CORS(branches_blueprint)
@@ -27,6 +25,7 @@ def get_branches(chat_id):
     return jsonify(
         branches_names
         ), 200
+
 
 @branches_blueprint.route("/branches/datecommits/<chat_id>", methods=["GET"])
 def get_commits_dates(chat_id):
