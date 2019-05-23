@@ -16,7 +16,6 @@ class Branch():
 
         try:
             branches_dict = {"branches": []}
-            branches_data = {"name": 0}
             response = requests.get(self.github_url + "{project_owner}/"
                                     "{project_name}/branches".format(
                                         project_owner=project_owner,
@@ -29,6 +28,7 @@ class Branch():
             raise HTTPError(json.dumps(dict_error))
         else:
             for i, item in enumerate(received_branches):
+                branches_data = {"name": 0}
                 branches_data["name"] = received_branches[i]["name"]
                 branches_dict["branches"].append(branches_data)
         return branches_dict
@@ -37,7 +37,6 @@ class Branch():
 
         try:
             branches_dict = {"branches": []}
-            branches_data = {"name": 0, "date": 0}
             branches_names = self.get_branches_names(
                              project_name, project_owner)
 
@@ -46,6 +45,7 @@ class Branch():
             raise HTTPError(json.dumps(dict_error))
         else:
             for i, branch_name in enumerate(branches_names["branches"]):
+                branches_data = {"name": 0, "date": 0}
                 response = requests.get(self.github_url + "{project_owner}/"
                                         "{project_name}/branches/"
                                         "{branch_name}".format(

@@ -14,7 +14,6 @@ class PullRequest():
     def get_pull_requests(self, project_owner, project_name):
         try:
             pull_request_dict = {"pull_request": []}
-            pull_request_data = {"title": 0, "url": 0}
 
             response = requests.get(self.github_url + "{project_owner}"
                                     "/{project_name}/pulls".format(
@@ -27,6 +26,7 @@ class PullRequest():
             raise HTTPError(json.dumps(dict_error))
         else:
             for i, data in enumerate(requested_pull_requests):
+                pull_request_data = {"title": 0, "url": 0}
                 pull_request_data["title"] = data["title"]
                 pull_request_data["url"] = data["html_url"]
                 pull_request_dict["pull_request"].append(pull_request_data)

@@ -16,7 +16,7 @@ class Release():
 
         try:
             release_dict = {"release": []}
-            release_data = {"name": 0, "body": 0, "created_at": 0}
+            release_data = {"name": 0, "body": 0, "created_at": 0, "url": 0}
             response = requests.get(self.github_url + "{project_owner}/"
                                     "{project_name}/releases".format(
                                         project_owner=project_owner,
@@ -31,5 +31,6 @@ class Release():
             release_data["name"] = received_releases[0]["name"]
             release_data["body"] = received_releases[0]["body"]
             release_data["created_at"] = received_releases[0]["created_at"]
+            release_data["url"] = received_releases[0]["url"]
             release_dict["release"].append(release_data)
         return release_dict
