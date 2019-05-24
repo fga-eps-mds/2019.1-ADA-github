@@ -1,6 +1,8 @@
 import requests
 from requests.exceptions import HTTPError
 import json
+import datetime
+from datetime import date
 
 
 class Branch():
@@ -45,7 +47,7 @@ class Branch():
             raise HTTPError(json.dumps(dict_error))
         else:
             for i, branch_name in enumerate(branches_names["branches"]):
-                branches_data = {"name": 0, "date": 0}
+                branches_data = {"name": 0, "last_commit_days": 0}
                 response = requests.get(self.github_url + "{project_owner}/"
                                         "{project_name}/branches/"
                                         "{branch_name}".format(
@@ -55,7 +57,18 @@ class Branch():
                                         headers=self.headers)
                 received_json = response.json()
                 branches_data["name"] = branch_name["name"]
-                branches_data["date"] = (received_json["commit"]["commit"]
-                                                      ["author"]["date"])
+                commit_days = self.get_last_commit_days(
+                                            received_json["commit"]
+                                            ["commit"]["author"]["date"])
+                branches_data["last_commit_days"] = commit_days
                 branches_dict["branches"].append(branches_data)
         return branches_dict
+
+    def get_last_commit_days(self, branch_commit_date):
+        todays_date = date.today()
+        commit_date = datetime.datetime.strptime(
+            branch_commit_date[0:10], "%Y-%m-%d")
+        commit_date = commit_date.date()
+        qntd_days = todays_date-commit_date
+        commit_days = str(qntd_days.days)
+        return commit_days
