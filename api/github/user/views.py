@@ -8,7 +8,6 @@ import telegram
 import requests
 import json
 import os
-import sys
 
 
 github_blueprint = Blueprint("github", __name__)
@@ -49,7 +48,7 @@ def get_access_token(chat_id):
 
     try:
         post = requests.post(url=oauth_user,
-                            headers=header)
+                             headers=header)
         post_json = post.json()
         GITHUB_TOKEN = post_json['access_token']
 
@@ -66,22 +65,21 @@ def get_access_token(chat_id):
         else:
             existing_user.update(access_token=GITHUB_TOKEN)
             user = UserInfo(GITHUB_TOKEN)
-            user_infos = user.get_user() 
+            user_infos = user.get_user()
         user.send_message(ACCESS_TOKEN, chat_id)
         redirect_uri = "https://t.me/{bot_name}".format(bot_name=BOT_NAME)
         bot = telegram.Bot(token=ACCESS_TOKEN)
         repo_names = user.select_repos_by_buttons(user)
         reply_markup = telegram.InlineKeyboardMarkup(repo_names)
         bot.send_message(chat_id=chat_id,
-                            text="Encontrei esses repositórios na sua "
-                            "conta do GitHub. Qual você quer que eu "
-                            "monitore? Clica nele!",
-                            reply_markup=reply_markup)
+                         text="Encontrei esses repositórios na sua "
+                         "conta do GitHub. Qual você quer que eu "
+                         "monitore? Clica nele!",
+                         reply_markup=reply_markup)
         redirect_uri = "https://t.me/Ada_Git_Bot?start={github_id}".format(
             github_id=db_user.github_user_id)
-    except:
+    except Exception:
         redirect_uri = "https://t.me/Ada_Git_Bot"
-        
     return redirect(redirect_uri, code=302)
 
 @github_blueprint.route("/user/<github_username>/repositories",
@@ -90,7 +88,6 @@ def get_repositories(github_username):
     try:
         db_user = User.objects(github_user=github_username).first()
         user_repositories = UserInfo(db_user.access_token)
-
         requested_repos = user_repositories.get_repos()
     except HTTPError as http_error:
         dict_message = json.loads(str(http_error))
@@ -128,8 +125,6 @@ def get_github_login(chat_id):
 @github_blueprint.route("/user/repo", methods=["POST"])
 def register_repository():
     repo_data = request.get_json()
-    print('#'*30, file=sys.stderr)
-    print(repo_data, file=sys.stderr)
     repo_name = repo_data
     try:
         db_user = User()
