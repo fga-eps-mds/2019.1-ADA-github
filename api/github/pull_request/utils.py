@@ -20,6 +20,7 @@ class PullRequest():
                                         project_owner=project_owner,
                                         project_name=project_name),
                                     headers=self.headers)
+            response.raise_for_status()
             requested_pull_requests = response.json()
         except HTTPError as http_error:
             dict_error = {"status_code": http_error.response.status_code}
