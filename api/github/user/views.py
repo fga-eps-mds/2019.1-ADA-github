@@ -6,7 +6,6 @@ from requests.exceptions import HTTPError
 from github.data.user import User
 import telegram
 import requests
-import sys
 import json
 import os
 
@@ -75,8 +74,9 @@ def get_access_token(chat_id):
                      "conta do GitHub. Qual você quer que eu "
                      "monitore? Clica nele!",
                      reply_markup=reply_markup)
-    redirect_uri = "https://t.me/Ada_Git_Bot?start={github_id}".format(
-        github_id=db_user.github_user_id)
+    redirect_uri = "https://t.me/{bot_name}".format(
+                    bot_name=BOT_NAME)
+
     return redirect(redirect_uri, code=302)
 
 @github_blueprint.route("/user/<github_username>/repositories",
@@ -106,7 +106,6 @@ def get_github_login(chat_id):
     try:
         db_user = User.objects(chat_id=chat_id).first()
         username = db_user.github_user
-        print(username, file=sys.stderr)
     except HTTPError as http_error:
         dict_message = json.loads(str(http_error))
         if dict_message["status_code"] == 401:

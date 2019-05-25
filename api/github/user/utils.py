@@ -30,9 +30,8 @@ class UserInfo():
         }
         github_username = self.get_user()
         login = github_username["github_username"]
-        response = requests.get('https://api.github.com/users/{login}'
-                                '/repos'.format(login=login),
-                                headers=headers)
+        response = requests.get('https://api.github.com/users/{login}/repos'.
+                                format(login=login), headers=headers)
         repository = response.json()
         requested_repositories = {"repositories": []}
         for i, item in enumerate(repository):
@@ -48,8 +47,8 @@ class UserInfo():
         access_token = os.environ.get("ACCESS_TOKEN", "")
         bot = telegram.Bot(token=access_token)
         bot.send_message(chat_id=chat_id,
-                         text="Você foi cadastrado com sucesso no GitHub,"
-                              "{user}".format(user=login))
+                         text="Você foi cadastrado com sucesso"
+                              "no GitHub, {user}".format(user=login))
 
     def select_repos_by_buttons(self, user):
         received_repos = user.get_repos()
