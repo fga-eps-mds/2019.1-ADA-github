@@ -1,12 +1,8 @@
-import json
-import unittest
-import mongoengine
 from github.data import init_db
 from github.data.user import User
 from github.data.project import Project
 from github.tests.base import BaseTestCase
-from jsonschema import validate
-import os
+
 
 class TestProject(BaseTestCase):
     def setup(self):

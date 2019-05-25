@@ -16,7 +16,7 @@ view_get_access_token_schema = {
     "properties": {
         "message": {"type": "string"}
     },
-    "required": ["message"] 
+    "required": ["message"]
 }
 
 view_get_repos_schema = {

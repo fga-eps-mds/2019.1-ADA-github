@@ -1,12 +1,7 @@
-import json
-import unittest
-import mongoengine
-from github.data import init_db
 from github.data.user import User
 from github.data.project import Project
 from github.tests.base import BaseTestCase
-from jsonschema import validate
-import os
+
 
 class TestUserDatabase(BaseTestCase):
 
@@ -18,7 +13,6 @@ class TestUserDatabase(BaseTestCase):
         user2 = User.objects(github_user=username).first()
         self.assertEqual(user, user2)
 
-        
     def test_save_github_repo_data(self):
         user = User()
         username = "teste_User"
