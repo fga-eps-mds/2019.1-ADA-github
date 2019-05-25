@@ -28,9 +28,10 @@ class Release():
             dict_error = {"status_code": http_error.response.status_code}
             raise HTTPError(json.dumps(dict_error))
         else:
-            release_data["name"] = received_releases[0]["name"]
-            release_data["body"] = received_releases[0]["body"]
-            release_data["created_at"] = received_releases[0]["created_at"]
-            release_data["url"] = received_releases[0]["url"]
-            release_dict["release"].append(release_data)
+            if received_releases:
+                release_data["name"] = received_releases[0]["name"]
+                release_data["body"] = received_releases[0]["body"]
+                release_data["created_at"] = received_releases[0]["created_at"]
+                release_data["url"] = received_releases[0]["html_url"]
+                release_dict["release"].append(release_data)
         return release_dict

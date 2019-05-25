@@ -7,6 +7,8 @@ from github.tests.jsonschemas.schemas import\
 from github.issue.utils import Issue
 from jsonschema import validate
 import os
+from github.data.user import User
+from github.data.project import Project
 from requests.exceptions import HTTPError
 
 
@@ -20,13 +22,23 @@ class TestBuild(BaseTestCase):
         validate(data, ping_json)
 
     def test_view_create_issue(self):
+        GITHUB_API_TOKEN = os.getenv("GITHUB_API_TOKEN", "")
         chat_id = "123456789"
+        project = Project()
+        project.name = "apitest"
+        project.save()
+        user = User()
+        user.chat_id = chat_id
+        user.access_token = GITHUB_API_TOKEN
+        user.github_user = "sudjoao"
+        user.project = project
+        user.save()
+
         issue_body = {
             "title": "Criando uma dsasaasd.",
             "body": " Teste utilizando JSON post"
             }
 
-        GITHUB_API_TOKEN = os.getenv("GITHUB_API_TOKEN", "")
         headers = {
             "Content-Type": "application/json",
             "Authorization": "Bearer " + GITHUB_API_TOKEN
@@ -37,7 +49,8 @@ class TestBuild(BaseTestCase):
                                      chat_id=chat_id),
                                     headers=headers,
                                     data=json.dumps(issue_body))
-
+        User.delete(user)
+        Project.delete(project)
         data = json.loads(response.data.decode())
         create_issue_string = json.dumps(create_issue_schema)
         create_issue_json = json.loads(create_issue_string)

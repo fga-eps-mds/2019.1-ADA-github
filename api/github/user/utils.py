@@ -38,7 +38,6 @@ class UserInfo():
             repository_data = {"name": 0}
             repository_data["name"] = repository[i]['name']
             requested_repositories["repositories"].append(repository_data)
-        print(requested_repositories["repositories"])
         return requested_repositories
 
     def send_message(self, token, chat_id):
