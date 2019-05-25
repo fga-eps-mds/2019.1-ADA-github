@@ -76,10 +76,8 @@ def get_access_token(chat_id):
                          "conta do GitHub. Qual você quer que eu "
                          "monitore? Clica nele!",
                          reply_markup=reply_markup)
-        redirect_uri = "https://t.me/Ada_Git_Bot?start={github_id}".format(
-            github_id=db_user.github_user_id)
     except Exception:
-        redirect_uri = "https://t.me/Ada_Git_Bot"
+        redirect_uri = "https://t.me/{bot_name}".format(bot_name=BOT_NAME)
     return redirect(redirect_uri, code=302)
 
 @github_blueprint.route("/user/<github_username>/repositories",

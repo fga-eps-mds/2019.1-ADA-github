@@ -7,9 +7,9 @@ from github.tests.jsonschemas.schemas import\
 from github.issue.utils import Issue
 from jsonschema import validate
 import os
-from requests.exceptions import HTTPError
-from github.data.project import Project
 from github.data.user import User
+from github.data.project import Project
+from requests.exceptions import HTTPError
 
 
 class TestIssue(BaseTestCase):
@@ -22,13 +22,12 @@ class TestIssue(BaseTestCase):
         validate(data, ping_json)
 
     def test_view_create_issue(self):
-        chat_id = "657382654"
+        GITHUB_API_TOKEN = os.getenv("GITHUB_API_TOKEN", "")
         issue_body = {
             "title": "Criando uma issue.",
             "body": "Teste utilizando JSON post"
             }
 
-        GITHUB_API_TOKEN = os.getenv("GITHUB_API_TOKEN", "")
         headers = {
             "Content-Type": "application/json",
             "Authorization": "Bearer " + GITHUB_API_TOKEN
@@ -47,10 +46,11 @@ class TestIssue(BaseTestCase):
         user.save()
         response = self.client.post("/api/new_issue/"
                                     "{chat_id}".format(
-                                     chat_id=chat_id),
+                                     chat_id=user.chat_id),
                                     headers=headers,
                                     data=json.dumps(issue_body))
-
+        User.delete(user)
+        Project.delete(project)
         data = json.loads(response.data.decode())
         create_issue_string = json.dumps(create_issue_schema)
         create_issue_json = json.loads(create_issue_string)
