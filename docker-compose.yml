@@ -15,11 +15,11 @@ services:
     environment:
       - DB_NAME=${DB_NAME}
       - DB_URL=${DB_URL}
-      - GITHUB_API_TOKEN=${GITHUB_API_TOKEN}
       - GITHUB_OAUTH_CLIENT_ID=${GITHUB_OAUTH_CLIENT_ID}
       - GITHUB_OAUTH_CLIENT_SECRET=${GITHUB_OAUTH_CLIENT_SECRET}
       - ACCESS_TOKEN=${ACCESS_TOKEN}
       - BOT_NAME=${BOT_NAME}
+      - GITHUB_API_TOKEN=${GITHUB_API_TOKEN}
       - FLASK_APP=github/__init__.py
       - FLASK_ENV=development
       - APP_SETTINGS=github.config.DevelopmentConfig
