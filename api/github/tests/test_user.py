@@ -39,36 +39,19 @@ class TestUser(BaseTestCase):
         
         response = self.client.get("/user/github/authorize/{chat_id}"
                                     .format(chat_id = chat_id))
-        #data = response.data.decode()
-        #user_string = json.dumps(view_get_access_token_schema)
-        #user_json = json.loads(user_string)
-        print(response.status_code, file=sys.stderr)
-        print("#"*30, file=sys.stderr)
         self.assertEquals(response.status_code, 302)
-        #validate(data, user_json)
 
     def invalid_test_view_get_access_token(self):
         chat_id = "12"
-        
         response = self.client.get("/user/github/authorize/{chat_id}"
                                     .format(chat_id = chat_id))
-        #data = response.data.decode()
-        #user_string = json.dumps(view_get_access_token_schema)
-        #user_json = json.loads(user_string)
-        print(response.status_code, file=sys.stderr)
-        print("#"*30, file=sys.stderr)
+        data = response.data.decode()
+        user_string = json.dumps(view_get_access_token_schema)
+        user_json = json.loads(user_string)
         self.assertEquals(response.status_code, 302)
-        #validate(data, user_json)
+        validate(data, user_json)
 
-    def test_view_get_repos(self):
-        # init_db()
-        # user = User()
-        # user.access_token = "fa1bc720b86788f05c624b63693e1beee3748f75"
-        # user.github_user = "caiovfernandes"
-        # user.chat_id = "662358971"
-        # user.github_user_id = "42192251"
-        # user.save()
-        
+    def test_view_get_repos(self):        
         username = self.user.github_user
         response = self.client.get("/user/{github_username}/repositories"
                                     .format(github_username = username))
@@ -87,7 +70,6 @@ class TestUser(BaseTestCase):
         user_json = json.loads(user_string)
         self.assertEqual(response.status_code, 404)
         validate(data, user_json)
-        
     
     def test_view_get_github_login(self):
         chat_id  = self.user.chat_id
