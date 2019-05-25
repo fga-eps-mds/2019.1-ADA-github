@@ -1,8 +1,6 @@
 # api/github/tests/base.py
 
-
 from flask_testing import TestCase
-
 from github import create_app
 
 

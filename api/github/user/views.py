@@ -45,38 +45,39 @@ def get_access_token(chat_id):
                                   client_id=CLIENT_ID,
                                   client_secret=CLIENT_SECRET))
     data = json.dumps(data)
-    post = requests.post(url=oauth_user,
-                         headers=header)
-    post_json = post.json()
-    GITHUB_TOKEN = post_json['access_token']
 
-    existing_user = User.objects(chat_id=chat_id).first()
-    if not existing_user:
-        db_user = User()
-        db_user.access_token = GITHUB_TOKEN
-        db_user.chat_id = str(chat_id)
-        user = UserInfo(GITHUB_TOKEN)
-        user_infos = user.get_user()
-        db_user.github_user = user_infos["github_username"]
-        db_user.github_user_id = str(user_infos["github_user_id"])
-        db_user.save()
-    else:
-        existing_user.update(access_token=GITHUB_TOKEN)
-        user = UserInfo(GITHUB_TOKEN)
-        user_infos = user.get_user()
-    user.send_message(ACCESS_TOKEN, chat_id)
-    redirect_uri = "https://t.me/{bot_name}".format(bot_name=BOT_NAME)
-    bot = telegram.Bot(token=ACCESS_TOKEN)
-    repo_names = user.select_repos_by_buttons(user)
-    reply_markup = telegram.InlineKeyboardMarkup(repo_names)
-    bot.send_message(chat_id=chat_id,
-                     text="Encontrei esses repositórios na sua "
-                     "conta do GitHub. Qual você quer que eu "
-                     "monitore? Clica nele!",
-                     reply_markup=reply_markup)
-    redirect_uri = "https://t.me/{bot_name}".format(
-                    bot_name=BOT_NAME)
+    try:
+        post = requests.post(url=oauth_user,
+                             headers=header)
+        post_json = post.json()
+        GITHUB_TOKEN = post_json['access_token']
 
+        existing_user = User.objects(chat_id=chat_id).first()
+        if not existing_user:
+            db_user = User()
+            db_user.access_token = GITHUB_TOKEN
+            db_user.chat_id = str(chat_id)
+            user = UserInfo(GITHUB_TOKEN)
+            user_infos = user.get_user()
+            db_user.github_user = user_infos["github_username"]
+            db_user.github_user_id = str(user_infos["github_user_id"])
+            db_user.save()
+        else:
+            existing_user.update(access_token=GITHUB_TOKEN)
+            user = UserInfo(GITHUB_TOKEN)
+            user_infos = user.get_user()
+        user.send_message(ACCESS_TOKEN, chat_id)
+        redirect_uri = "https://t.me/{bot_name}".format(bot_name=BOT_NAME)
+        bot = telegram.Bot(token=ACCESS_TOKEN)
+        repo_names = user.select_repos_by_buttons(user)
+        reply_markup = telegram.InlineKeyboardMarkup(repo_names)
+        bot.send_message(chat_id=chat_id,
+                         text="Encontrei esses repositórios na sua "
+                         "conta do GitHub. Qual você quer que eu "
+                         "monitore? Clica nele!",
+                         reply_markup=reply_markup)
+    except Exception:
+        redirect_uri = "https://t.me/{bot_name}".format(bot_name=BOT_NAME)
     return redirect(redirect_uri, code=302)
 
 @github_blueprint.route("/user/<github_username>/repositories",
@@ -85,7 +86,6 @@ def get_repositories(github_username):
     try:
         db_user = User.objects(github_user=github_username).first()
         user_repositories = UserInfo(db_user.access_token)
-
         requested_repos = user_repositories.get_repos()
     except HTTPError as http_error:
         dict_message = json.loads(str(http_error))
