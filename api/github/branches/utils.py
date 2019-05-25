@@ -41,11 +41,6 @@ class Branch():
             branches_dict = {"branches": []}
             branches_names = self.get_branches_names(
                              project_name, project_owner)
-
-        except HTTPError as http_error:
-            dict_error = {"status_code": http_error.response.status_code}
-            raise HTTPError(json.dumps(dict_error))
-        else:
             for i, branch_name in enumerate(branches_names["branches"]):
                 branches_data = {"name": 0, "last_commit_days": 0}
                 response = requests.get(self.github_url + "{project_owner}/"
@@ -62,7 +57,13 @@ class Branch():
                                             ["commit"]["author"]["date"])
                 branches_data["last_commit_days"] = commit_days
                 branches_dict["branches"].append(branches_data)
-        return branches_dict
+        except HTTPError as http_error:
+            dict_message = json.loads(str(http_error))
+            dict_error = {"status_code": dict_message["status_code"]}
+            raise HTTPError(json.dumps(dict_error))
+
+        else:
+            return branches_dict
 
     def get_last_commit_days(self, branch_commit_date):
         todays_date = date.today()
