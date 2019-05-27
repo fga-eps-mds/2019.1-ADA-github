@@ -1,0 +1,108 @@
+stages:
+  - test
+  - build
+  - deploy
+
+variables:
+  ADA_GITHUB_IMAGE: $DOCKER_USER/ada-github
+
+#############################################################
+########################## TEST #############################
+#############################################################
+
+lint-flake8:
+  image: ejplatform/python:alpine
+  stage: test
+  script:
+    - flake8
+
+services:
+  - mongo:latest
+
+unit test:
+  image: python:3.6-slim
+  stage: test
+  variables:
+    FLASK_ENV: development
+    FLASK_APP: github/__init__.py
+    APP_SETTINGS: github.config.DevelopmentConfig  
+  before_script:
+    - export GITHUB_API_TOKEN=$GITHUB_API_TOKEN
+    - export GITHUB_OAUTH_CLIENT_ID=$GITHUB_OAUTH_CLIENT_ID
+    - export GITHUB_OAUTH_CLIENT_SECRET=$GITHUB_OAUTH_CLIENT_SECRET
+    - export DB_NAME=$DB_NAME
+    - export DB_URL=$DB_URL
+    - export ACCESS_TOKEN=$ACCESS_TOKEN
+    - pip install -r docker/requirements.txt    
+    - cd api/
+  script:
+    - python manage.py test
+    - python manage.py cov
+
+#############################################################
+################## BUILD HOMOLOG ############################
+#############################################################
+
+build ada-github-homolog:
+  image: docker:latest
+  stage: build
+  services:
+    - docker:dind
+  script:
+    - docker build -f ./docker/dev.Dockerfile -t $ADA_GITHUB_IMAGE:homolog .
+    - docker login -u $DOCKER_USER -p $DOCKER_PASS
+    - docker push $ADA_GITHUB_IMAGE:homolog
+  only:
+    - /230-DeployGithub/
+
+#############################################################
+################## BUILD PROD ###############################
+#############################################################
+
+build ada-github-prod:
+  image: docker:latest
+  stage: build
+  services:
+    - docker:dind
+  script:
+    - docker build -f ./docker/dev.Dockerfile -t $ADA_GITHUB_IMAGE:prod .
+    - docker login -u $DOCKER_USER -p $DOCKER_PASS
+    - docker push $ADA_GITHUB_IMAGE:prod
+  only:
+    - /master/
+
+#############################################################
+################## DEPLOY HOMOLOG ###########################
+#############################################################
+
+deploy ada-github-homolog:
+  image: cdrx/rancher-gitlab-deploy
+  stage: deploy
+  script:
+    - "upgrade
+            --rancher-url $RANCHER_URL
+            --rancher-key $RANCHER_ACCESS_KEY
+            --rancher-secret $RANCHER_SECRET_KEY
+            --environment $RANCHER_ENVIRONMENT
+            --stack $RANCHER_HOMOLOG_STACK
+            --service ada-github-homolog"
+  only:
+    - /230-DeployGithub/
+
+#############################################################
+################## DEPLOY PROD ##############################
+#############################################################
+
+deploy ada-github-prod:
+  image: cdrx/rancher-gitlab-deploy
+  stage: deploy
+  script:
+    - "upgrade
+            --rancher-url $RANCHER_URL
+            --rancher-key $RANCHER_ACCESS_KEY
+            --rancher-secret $RANCHER_SECRET_KEY
+            --environment $RANCHER_ENVIRONMENT
+            --stack $RANCHER_PROD_STACK
+            --service ada-github"
+  only:
+    - /master/
