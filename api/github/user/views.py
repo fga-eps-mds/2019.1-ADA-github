@@ -80,6 +80,7 @@ def get_access_token(chat_id):
         redirect_uri = "https://t.me/{bot_name}".format(bot_name=BOT_NAME)
     return redirect(redirect_uri, code=302)
 
+
 @github_blueprint.route("/user/<github_username>/repositories",
                         methods=["GET"])
 def get_repositories(github_username):

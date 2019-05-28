@@ -4,9 +4,11 @@ from github.tests.base import BaseTestCase
 
 
 class TestUserDatabase(BaseTestCase):
+    def setup(self):
+        super().setUp()
+        User.drop_collection()
 
     def test_create_user(self):
-        User.drop_collection()
         user = User()
         username = "teste_User"
         user.create_user(username)
