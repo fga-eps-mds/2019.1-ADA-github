@@ -15,11 +15,13 @@ class Webhook():
                 "url": GITHUB_SERVICE_URL + "github/webhooks/{chat_id}"
                                             .format(chat_id=self.chat_id),
                 "content_type": "json",
-                "insecure_ssl": "1"
+                "insecure_ssl": "0"
             },
-            "events": ["pull_request_review",
+            "events": ["issue_comment",
                        "issues",
-                       "pull_request"],
+                       "pull_request",
+                       "pull_request_review_comment",
+                       "pull_request_review"],
             "active": True
         }
 
