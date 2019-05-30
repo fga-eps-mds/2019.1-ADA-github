@@ -1,34 +1,26 @@
-import requests
-from requests.exceptions import HTTPError
-import json
+from github.utils.github_utils import GitHubUtils
 
 
-class PullRequest():
-    def __init__(self, GITHUB_TOKEN):
-        self.GITHUB_TOKEN = GITHUB_TOKEN
-        self.github_url = "https://api.github.com/repos/"
-        self.headers = {"Content-Type": "applications/json",
-                        "Authorization": "Bearer " +
-                        self.GITHUB_TOKEN}
+class PullRequest(GitHubUtils):
+
+    def __init__(self, chat_id):
+        super().__init__(chat_id)
 
     def get_pull_requests(self, project_owner, project_name):
-        try:
-            pull_request_dict = {"pull_request": []}
-
-            response = requests.get(self.github_url + "{project_owner}"
+        url = self.GITHUB_API_URL + "repos/{project_owner}"\
                                     "/{project_name}/pulls".format(
-                                        project_owner=project_owner,
-                                        project_name=project_name),
-                                    headers=self.headers)
-            response.raise_for_status()
-            requested_pull_requests = response.json()
-        except HTTPError as http_error:
-            dict_error = {"status_code": http_error.response.status_code}
-            raise HTTPError(json.dumps(dict_error))
-        else:
-            for i, data in enumerate(requested_pull_requests):
-                pull_request_data = {"title": 0, "url": 0}
-                pull_request_data["title"] = data["title"]
-                pull_request_data["url"] = data["html_url"]
-                pull_request_dict["pull_request"].append(pull_request_data)
+                                     project_owner=project_owner,
+                                     project_name=project_name)
+        requested_pull_requests = self.get_request(url)
+        project_pull_request = self.pull_requested_pull(
+                                    requested_pull_requests)
+        return project_pull_request
+
+    def pull_requested_pull(self, resp):
+        pull_request_dict = {"pull_request": []}
+        for i, data in enumerate(resp):
+            pull_request_data = {"title": 0, "url": 0}
+            pull_request_data["title"] = data["title"]
+            pull_request_data["url"] = data["html_url"]
+            pull_request_dict["pull_request"].append(pull_request_data)
         return pull_request_dict
