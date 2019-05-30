@@ -36,6 +36,7 @@ class Webhook():
             "Content-Type": "application/json",
             "Authorization": "Bearer " + GITHUB_TOKEN
         }
-        requests.post(url=set_webhook_url,
-                      data=json.dumps(self.webhook_json),
-                      headers=headers)
+        req = requests.post(url=set_webhook_url,
+                            data=json.dumps(self.webhook_json),
+                            headers=headers)
+        req.raise_for_status()
