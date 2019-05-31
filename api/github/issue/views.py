@@ -16,7 +16,7 @@ def create_issue(chat_id):
         response = request.get_json()
         title = response['title']
         body = response['body']
-        
+
         user = User.objects(chat_id=chat_id).first()
         project = Project()
         project = user.project

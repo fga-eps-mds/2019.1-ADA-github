@@ -17,7 +17,7 @@ def get_branches(chat_id):
         project = user.project
         branch = Branch(chat_id)
         branches_names = branch.get_branches_names(
-                         project.name, user.github_user)
+                            project.name, user.github_user)
     except HTTPError as http_error:
         user.error_message(http_error)
     except AttributeError:

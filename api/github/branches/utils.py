@@ -5,8 +5,8 @@ from datetime import date
 
 class Branch(GitHubUtils):
 
-    def __init__(self, chat_id):
-        super().__init__(chat_id)
+    def init(self, chat_id):
+        super().init(chat_id)
 
     def get_branches_names(self, project_name, project_owner):
         url = self.GITHUB_API_URL + "repos/{project_owner}/{project_name}"\
@@ -49,9 +49,11 @@ class Branch(GitHubUtils):
 
     def branches_requested_branches(self, resp):
         branches_dict = {"branches": []}
-
         for i, item in enumerate(resp):
             branches_data = {"name": 0}
-            branches_data["name"] = resp[i]["name"]
-            branches_dict["branches"].append(branches_data)
+            self.update_branches_data(branches_data, branches_dict, resp, i)
         return branches_dict
+
+    def update_branches_data(self, branches_data, branches_dict, resp, count):
+        branches_data["name"] = resp[count]["name"]
+        branches_dict["branches"].append(branches_data)

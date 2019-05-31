@@ -1,16 +1,20 @@
 from github.utils.github_utils import GitHubUtils
+import sys
 
 
 class Release(GitHubUtils):
 
-    def __init__(self, chat_id):
+    def __init__(self, chat_id, project_owner, project_name):
         super().__init__(chat_id)
+        self.project_owner_project_name = "repos/{project_owner}/"\
+                                          "{project_name}".format(
+                                           project_owner=project_owner,
+                                           project_name=project_name)
 
-    def get_last_release(self, project_owner, project_name):
-        url = self.GITHUB_API_URL + "repos/{project_owner}/"\
-                                    "{project_name}/releases".format(
-                                     project_owner=project_owner,
-                                     project_name=project_name)
+    def get_last_release(self):
+        url = self.GITHUB_API_URL + self.project_owner_project_name +\
+                                    "/releases"
+        print(url, file=sys.stderr)
         requested_release = self.get_request(url)
         project_releases = self.releases_requested_releases(requested_release)
         return project_releases

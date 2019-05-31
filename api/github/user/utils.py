@@ -41,9 +41,14 @@ class UserInfo(GitHubUtils):
         repositories = {"repositories": []}
         for i, item in enumerate(requested_repositories):
             repository_data = {"name": 0}
-            repository_data["name"] = requested_repositories[i]['name']
-            repositories["repositories"].append(repository_data)
+            self.update_repositories_data(repository_data, repositories,
+                                          requested_repositories, i)
         return repositories
+
+    def update_repositories_data(self, repository_data,
+                                 repositories, resp, count):
+        repository_data["name"] = resp[count]['name']
+        repositories["repositories"].append(repository_data)
 
     def select_repos_by_buttons(self, user):
         received_repositories = user.get_repositories()
