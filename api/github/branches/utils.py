@@ -8,11 +8,9 @@ class Branch(GitHubUtils):
     def init(self, chat_id):
         super().init(chat_id)
 
-    def get_branches_names(self, project_name, project_owner):
-        url = self.GITHUB_API_URL + "repos/{project_owner}/{project_name}"\
-                                    "/branches".format(
-                                        project_owner=project_owner,
-                                        project_name=project_name)
+    def get_branches_names(self, project_owner, project_name):
+        url = self.GITHUB_API_URL + self.project_owner_project_name(
+                                    project_owner, project_name, "branches")
         requested_branches = self.get_request(url)
         project_branches = self.branches_requested_branches(requested_branches)
         return project_branches
@@ -54,6 +52,7 @@ class Branch(GitHubUtils):
             self.update_branches_data(branches_data, branches_dict, resp, i)
         return branches_dict
 
-    def update_branches_data(self, branches_data, branches_dict, resp, count):
+    def update_branches_data(self, branches_data, branches_dict,
+                             resp, count):
         branches_data["name"] = resp[count]["name"]
         branches_dict["branches"].append(branches_data)

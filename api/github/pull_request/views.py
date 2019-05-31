@@ -12,12 +12,13 @@ CORS(pull_request_blueprint)
 
 @pull_request_blueprint.route("/pullrequest/<chat_id>", methods=["GET"])
 def get_pull_request(chat_id):
+
     try:
         user = User.objects(chat_id=chat_id).first()
-        project = user.project
+        project_pr = user.project
         pull_request = PullRequest(chat_id)
         pull_request_data = pull_request.get_pull_requests(user.github_user,
-                                                           project.name)
+                                                           project_pr.name)
     except HTTPError as http_error:
         user.error_message(http_error)
     except AttributeError:

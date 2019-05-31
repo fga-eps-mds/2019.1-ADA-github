@@ -6,7 +6,6 @@ from github.user.error_messages import NOT_FOUND
 from requests.exceptions import HTTPError
 from github.data.user import User
 import os
-import telegram
 
 
 github_blueprint = Blueprint("github", __name__)
@@ -34,14 +33,8 @@ def get_access_token(chat_id):
         db_user.github_user = user_infos["github_username"]
         db_user.github_user_id = str(user_infos["github_user_id"])
         db_user.save()
-    bot = telegram.Bot(token=ACCESS_TOKEN)
-    repositories_names = user.select_repos_by_buttons(user)
-    reply_markup = telegram.InlineKeyboardMarkup(repositories_names)
-    bot.send_message(chat_id=chat_id,
-                     text="Encontrei esses repositórios na sua "
-                          "conta do GitHub. Qual você quer que eu "
-                          "monitore? Clica nele!",
-                     reply_markup=reply_markup)
+        user.send_button_message(user_infos, chat_id)
+
     redirect_uri = "https://t.me/{bot_name}".format(bot_name=BOT_NAME)
     return redirect(redirect_uri, code=302)
 
@@ -64,7 +57,7 @@ def get_repositories(chat_id):
         ), 200
 
 
-@github_blueprint.route("/user/save/repository/<chat_id>", methods=["POST"])
+@github_blueprint.route("/user/repo/<chat_id>", methods=["POST"])
 def register_repository(chat_id):
     repo_data = request.get_json()
     repo_name = repo_data

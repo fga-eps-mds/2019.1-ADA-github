@@ -1,5 +1,4 @@
 from github.utils.github_utils import GitHubUtils
-import sys
 
 
 class Release(GitHubUtils):
@@ -14,7 +13,6 @@ class Release(GitHubUtils):
     def get_last_release(self):
         url = self.GITHUB_API_URL + self.project_owner_project_name +\
                                     "/releases"
-        print(url, file=sys.stderr)
         requested_release = self.get_request(url)
         project_releases = self.releases_requested_releases(requested_release)
         return project_releases

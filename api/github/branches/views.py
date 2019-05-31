@@ -14,10 +14,10 @@ CORS(branches_blueprint)
 def get_branches(chat_id):
     try:
         user = User.objects(chat_id=chat_id).first()
-        project = user.project
+        project_branches = user.project
         branch = Branch(chat_id)
         branches_names = branch.get_branches_names(
-                            project.name, user.github_user)
+                            user.github_user, project_branches.name)
     except HTTPError as http_error:
         user.error_message(http_error)
     except AttributeError:

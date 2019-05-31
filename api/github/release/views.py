@@ -13,8 +13,8 @@ CORS(release_blueprint)
 def get_releases(chat_id):
     try:
         user = User.objects(chat_id=chat_id).first()
-        project = user.project
-        release = Release(chat_id, user.github_user, project.name)
+        project_release = user.project
+        release = Release(chat_id, user.github_user, project_release.name)
         release_data = release.get_last_release()
     except HTTPError as http_error:
         user.error_messages(http_error)

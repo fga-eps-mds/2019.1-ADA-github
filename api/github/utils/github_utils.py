@@ -72,3 +72,10 @@ class GitHubUtils:
         else:
             resp_json = response.json()
             return resp_json
+
+    def project_owner_project_name(self, project_owner, project_name, name):
+        url = "repos/{project_owner}/{project_name}/"\
+              "{name}".format(
+               project_owner=project_owner,
+               project_name=project_name, name=name)
+        return url

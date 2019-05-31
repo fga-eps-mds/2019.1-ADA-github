@@ -38,20 +38,20 @@ class UserInfo(GitHubUtils):
                                      login=username, access_token=self
                                      .GITHUB_API_TOKEN)
         requested_repositories = self.get_request(url)
+        project_repositories = self.repository_requested_repository(
+                                    requested_repositories)
+        return project_repositories
+
+    def repository_requested_repository(self, resp):
         repositories = {"repositories": []}
-        for i, item in enumerate(requested_repositories):
+        for i, item in enumerate(resp):
             repository_data = {"name": 0}
-            self.update_repositories_data(repository_data, repositories,
-                                          requested_repositories, i)
+            repository_data["name"] = resp[i]['name']
+            repositories["repositories"].append(repository_data)
         return repositories
 
-    def update_repositories_data(self, repository_data,
-                                 repositories, resp, count):
-        repository_data["name"] = resp[count]['name']
-        repositories["repositories"].append(repository_data)
-
     def select_repos_by_buttons(self, user):
-        received_repositories = user.get_repositories()
+        received_repositories = self.get_repositories()
         buttons = []
         for repositorio in received_repositories["repositories"]:
             buttons.append(telegram.InlineKeyboardButton(
@@ -75,6 +75,17 @@ class UserInfo(GitHubUtils):
                           "Tive um erro tentando cadastrar seu repositório. "
                           "Mais tarde você tenta. Ok?"}
             raise AttributeError(json.dumps(dict_error))
+
+    def send_button_message(self, user_infos, chat_id):
+        bot = telegram.Bot(token=ACCESS_TOKEN)
+        repo_names = self.select_repos_by_buttons(
+                     user_infos["github_username"])
+        reply_markup = telegram.InlineKeyboardMarkup(repo_names)
+        bot.send_message(chat_id=chat_id,
+                         text="Encontrei esses repositórios na sua "
+                         "conta do GitHub. Qual você quer que eu "
+                         "monitore? Clica nele!",
+                         reply_markup=reply_markup)
 
 
 def authenticate_access_token(code):
