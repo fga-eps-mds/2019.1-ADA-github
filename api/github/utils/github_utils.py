@@ -55,3 +55,20 @@ class GitHubUtils:
         raw_class_name = str(type(object)).split('.')[-1]
         class_name = re.sub('[^a-zA-Z]+', '', raw_class_name)
         return class_name
+
+    def post_request(self, url, data):
+        try:
+            response = requests.post(url, headers=self.headers,
+                                     data=json.dumps(data))
+            response.raise_for_status()
+        except HTTPError as http_error:
+            raise HTTPError(self.exception_json(http_error.
+                                                response.
+                                                status_code))
+        except AttributeError:
+            raise AttributeError(self.exception_json(404))
+        except IndexError:
+            raise IndexError(self.exception_json(404))
+        else:
+            resp_json = response.json()
+            return resp_json
