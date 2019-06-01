@@ -49,8 +49,7 @@ owner_and_repo_schema = {
     "type": "object",
     "properties": {
         "owner_and_repo": {"type": "string"}
-    }#,
-    #"required": ["branches"]
+    }
 }
 
 not_found_schema = {

@@ -1,7 +1,6 @@
 import requests
 import json
 from requests.exceptions import HTTPError
-import sys
 
 
 class FindProjectCollaborators():
@@ -15,9 +14,8 @@ class FindProjectCollaborators():
             "Authorization": "Bearer " + self.GITHUB_TOKEN
         }
         try:
-            response = requests.get(
-                "https://api.github.com/user/repos",
-                 headers=headers)
+            response = requests.get("https://api.github.com/user/repos",
+                                    headers=headers)
 
             response.raise_for_status()
         except HTTPError as http_error:
@@ -27,7 +25,7 @@ class FindProjectCollaborators():
         else:
             repositories = response.json()
             for item in repositories:
-                if(item["name"]==project_name):
+                if(item["name"] == project_name):
                     owner_and_repo = item["full_name"]
                     break
 
@@ -42,9 +40,9 @@ class FindProjectCollaborators():
 
             owner, repo = owner_and_repo.split("/")
             response = requests.get("https://api.github.com/repos/"
-                                    +"{owner}/{repo}/contributors".
-                                     format(owner=owner, repo=repo),
-                                     headers=headers)
+                                    + "{owner}/{repo}/contributors".
+                                    format(owner=owner, repo=repo),
+                                    headers=headers)
 
             response.raise_for_status()
 

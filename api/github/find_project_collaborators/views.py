@@ -1,22 +1,20 @@
-from flask import jsonify, Blueprint, request
+from flask import jsonify, Blueprint
 import json
 from requests.exceptions import HTTPError
 from flask_cors import CORS
 from github.find_project_collaborators.utils import FindProjectCollaborators
-from github.user.utils import User
 from github.data.user import User
-from github.data.project import Project
 from github.find_project_collaborators.error_messages import NOT_FOUND,\
                                                              UNAUTHORIZED
-import sys
 
 
 find_project_collaborators_blueprint = Blueprint("find_project_collaborators",
-                                                      __name__)
+                                                 __name__)
 CORS(find_project_collaborators_blueprint)
 
-@find_project_collaborators_blueprint.route("/api/find_collaborators/<chat_id>",
-                                                 methods=["GET"])
+
+@find_project_collaborators_blueprint.route("/api/find_collaborators/" +
+                                            "<chat_id>", methods=["GET"])
 def find_collaborators(chat_id):
     try:
 
