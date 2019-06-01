@@ -21,9 +21,7 @@ def find_collaborators(chat_id):
     try:
 
         # achar o usuario e o projeto dele
-        user = User()
         user = User.objects(chat_id=chat_id).first()
-        project = Project()
         project = user.project
         project_name = project.name
         # passar isso pra classe principal da utils

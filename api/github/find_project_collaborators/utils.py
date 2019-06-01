@@ -1,6 +1,7 @@
 import requests
 import json
 from requests.exceptions import HTTPError
+import sys
 
 
 class FindProjectCollaborators():
@@ -39,10 +40,12 @@ class FindProjectCollaborators():
         }
         try:
 
-            response = requests.get("https://api.github.com/repos/\
-                                     {owner_and_repo}/contributors".
-                                     format(owner_and_repo=owner_and_repo),
+            owner, repo = owner_and_repo.split("/")
+            response = requests.get("https://api.github.com/repos/"
+                                    +"{owner}/{repo}/contributors".
+                                     format(owner=owner, repo=repo),
                                      headers=headers)
+
             response.raise_for_status()
 
         except HTTPError as http_error:
