@@ -16,12 +16,35 @@ ACCESS_TOKEN = os.getenv("ACCESS_TOKEN", "")
 @webhook_blueprint.route("/webhook", methods=["POST"])
 def set_webhook():
     try:
-        post_json = request.get_json()
+        post_json = json.loads(request.data)
         chat_id = post_json["chat_id"]
         owner = post_json["owner"]
         repo = post_json["repo"]
         webhook = Webhook(chat_id)
         webhook.set_webhook(owner, repo)
+    except HTTPError as http_error:
+        dict_message = json.loads(str(http_error))
+        if dict_message["status_code"] == 401:
+            return jsonify(UNAUTHORIZED), 401
+        else:
+            return jsonify(NOT_FOUND), 404
+    except AttributeError:
+        return jsonify(NOT_FOUND), 404
+    else:
+        return jsonify({
+            "success": "200"
+        }), 200
+
+
+@webhook_blueprint.route("/webhook/delete", methods=["POST"])
+def delete_webhook():
+    try:
+        post_json = json.loads(request.data)
+        chat_id = post_json["chat_id"]
+        owner = post_json["owner"]
+        repo = post_json["repo"]
+        webhook = Webhook(chat_id)
+        webhook.delete_hook(owner, repo)
     except HTTPError as http_error:
         dict_message = json.loads(str(http_error))
         if dict_message["status_code"] == 401:

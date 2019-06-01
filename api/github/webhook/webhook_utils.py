@@ -40,3 +40,26 @@ class Webhook():
                             data=json.dumps(self.webhook_json),
                             headers=headers)
         req.raise_for_status()
+
+    def delete_hook(self, owner, repo):
+        hook_url = "https://api.github.com/"\
+                   "repos/{owner}/{repo}/"\
+                   "hooks".format(owner=owner,
+                                  repo=repo)
+        user = User.objects(chat_id=self.chat_id).first()
+        GITHUB_TOKEN = user.access_token
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + GITHUB_TOKEN
+        }
+        hook = requests.get(hook_url, headers=headers)
+        hook = hook.json()
+        if len(hook):
+            hook_id = hook[0]["id"]
+            delete_hook_url = "https://api.github.com/"\
+                              "repos/{owner}/{repo}/"\
+                              "hooks/{hook_id}".format(owner=owner,
+                                                       repo=repo,
+                                                       hook_id=hook_id)
+            req = requests.delete(delete_hook_url, headers=headers)
+            req.raise_for_status()
