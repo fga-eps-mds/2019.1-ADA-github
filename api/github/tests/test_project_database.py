@@ -1,4 +1,3 @@
-from github.data import init_db
 from github.data.user import User
 from github.data.project import Project
 from github.tests.base import BaseTestCase
@@ -6,10 +5,10 @@ from github.tests.base import BaseTestCase
 
 class TestProject(BaseTestCase):
     def setup(self):
-        init_db()
+        super().setUp()
+        Project.drop_collection()
 
     def test_create_project(self):
-        Project.drop_collection()
         project = Project()
         description = "Test project"
         name = "Test Project"

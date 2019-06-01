@@ -1,6 +1,5 @@
 import json
 import unittest
-from github.data import init_db
 from github.data.user import User
 from github.tests.base import BaseTestCase
 from github.tests.jsonschemas.user.schemas import\
@@ -17,7 +16,7 @@ GITHUB_API_TOKEN = os.environ.get("GITHUB_API_TOKEN", "")
 
 class TestUser(BaseTestCase):
     def setUp(self):
-        init_db()
+        super().setUp()
         User.drop_collection()
         self.user = User()
         self.user.access_token = str(GITHUB_API_TOKEN)

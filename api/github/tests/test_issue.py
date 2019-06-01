@@ -13,6 +13,11 @@ from requests.exceptions import HTTPError
 
 
 class TestIssue(BaseTestCase):
+    def setup(self):
+        super().setUp()
+        Project.drop_collection()
+        User.drop_collection()
+
     def test_ping_pong(self):
         response = self.client.get("/issue/ping")
         data = json.loads(response.data.decode())
@@ -32,8 +37,6 @@ class TestIssue(BaseTestCase):
             "Content-Type": "application/json",
             "Authorization": "Bearer " + GITHUB_API_TOKEN
             }
-        Project.drop_collection()
-        User.drop_collection()
         project = Project()
         project.name = "meu-bot"
         project.save()

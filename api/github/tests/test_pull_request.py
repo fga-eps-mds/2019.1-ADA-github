@@ -6,7 +6,6 @@ from github.tests.jsonschemas.pull_request.schemas import\
 from jsonschema import validate
 from github.pull_request.utils import PullRequest
 from github.data.user import User
-from github.data import init_db
 from github.data.project import Project
 from requests.exceptions import HTTPError
 import os
@@ -14,7 +13,7 @@ import os
 
 class TestPullRequest(BaseTestCase):
     def setup(self):
-        init_db()
+        super().setUp()
         Project.drop_collection()
         User.drop_collection()
 

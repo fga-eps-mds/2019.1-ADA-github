@@ -6,7 +6,6 @@ from github.tests.jsonschemas.release.schemas import\
 from jsonschema import validate
 from github.release.utils import Release
 from github.data.user import User
-from github.data import init_db
 from github.data.project import Project
 from requests.exceptions import HTTPError
 import os
@@ -14,7 +13,7 @@ import os
 
 class TestRelease(BaseTestCase):
     def setup(self):
-        init_db()
+        super().setUp()
         Project.drop_collection()
         User.drop_collection()
 
