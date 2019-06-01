@@ -35,8 +35,9 @@ class UserInfo():
         repository = response.json()
         requested_repositories = {"repositories": []}
         for i, item in enumerate(repository):
-            repository_data = {"name": 0}
+            repository_data = {"name": 0, "full_name": 0}
             repository_data["name"] = repository[i]['name']
+            repository_data["full_name"] = repository[i]['full_name']
             requested_repositories["repositories"].append(repository_data)
         return requested_repositories
 
@@ -56,7 +57,7 @@ class UserInfo():
             buttons.append(telegram.InlineKeyboardButton(
                     text=repositorio["name"],
                     callback_data="meu repositorio do github é " +
-                                  repositorio["name"]))
+                                  repositorio["full_name"]))
         repo_names = [buttons[i:i+2] for i in range(0, len(buttons), 2)]
         return repo_names
 
