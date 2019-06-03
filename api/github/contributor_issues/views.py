@@ -10,6 +10,7 @@ import sys
 contributor_issues_blueprint = Blueprint("contributor_issues", __name__)
 CORS(contributor_issues_blueprint)
 
+
 @contributor_issues_blueprint.route("/api/get_contributor_issues/<chat_id>/"
                                     "<contributor_username>", methods=["GET"])
 def get_contributor_issues(chat_id, contributor_username):
