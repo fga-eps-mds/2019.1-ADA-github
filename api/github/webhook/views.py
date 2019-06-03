@@ -144,21 +144,24 @@ def webhook_notification(chat_id):
             if "review" in list(req_json.keys()):
                 # new reviewed pr
                 title = req_json["pull_request"]["title"]
-                review_url = req_json["review"]["html_url"]
                 username = req_json["review"]["user"]["login"]
                 user_url = req_json["review"]["user"]["html_url"]
                 pull_request_url = req_json["pull_request"]["html_url"]
-                pull_request_state = req_json["pull_request"]["state"]
-                message = "💬 **Novo comentário de review no"\
-                          "Pull Request** [{title}]({pull_request_url})"\
-                          "\nPor: [{username}]({user_url})\nAtualmente,"\
-                          " o estado dele é: {state}.\nVocê pode visualizar"\
-                          " o comentário clicando [aqui]({review_url})."\
+                review_body = req_json["review"]["body"]
+                review_state = ""
+                if req_json["review"]["state"] == "approved":
+                    review_state = "O seu pull request foi aprovado! ✅\n"
+                elif req_json["review"]["state"] == "changes_requested":
+                    review_state = "Mudanças foram solicitadas. ❗️\n"
+
+                message = "💬 **Nova revisão no Pull Request**"\
+                          " [{title}]({pull_request_url})"\
+                          "\nPor: [{username}]({user_url})\n"\
                           .format(title=title,
                                   pull_request_url=pull_request_url,
-                                  username=username, user_url=user_url,
-                                  state=pull_request_state,
-                                  review_url=review_url)
+                                  username=username, user_url=user_url)
+                message += review_state
+                message += '"{review_body}"'.format(review_body=review_body)
                 bot.send_message(chat_id=chat_id,
                                  text=message,
                                  parse_mode='Markdown',
