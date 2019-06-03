@@ -16,7 +16,6 @@ def get_contributor_issues(chat_id, contributor_username):
     try:
         print("###"*60 + "\n" + chat_id + "###"*60 + "\n", file=sys.stderr)
         user = User.objects(chat_id=chat_id).first()
-        
         project = user.project
         contributor_issues = ContributorIssues(user.access_token)
         issues = contributor_issues.\
