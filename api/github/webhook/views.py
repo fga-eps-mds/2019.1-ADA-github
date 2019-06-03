@@ -115,8 +115,7 @@ def webhook_notification(chat_id):
         elif req_json["action"] == "created":
             if "pull_request_review_comment" in list(req_json.keys()):
                 # new comment on pr review
-                bot.send_message(chat_id=chat_id,
-                                 text="Novo comentário")
+                pass
             if "issue" in list(req_json.keys()):
                 # new issue comment
                 user = req_json["issue"]["user"]["login"]
@@ -144,7 +143,26 @@ def webhook_notification(chat_id):
         elif req_json["action"] == "submitted":
             if "review" in list(req_json.keys()):
                 # new reviewed pr
-                pass
+                title = req_json["pull_request"]["title"]
+                review_url = req_json["review"]["html_url"]
+                username = req_json["review"]["user"]["login"]
+                user_url = req_json["review"]["user"]["html_url"]
+                pull_request_url = req_json["pull_request"]["html_url"]
+                pull_request_state = req_json["pull_request"]["state"]
+                message = "💬 **Novo comentário de review no"\
+                          "Pull Request** [{title}]({pull_request_url})"\
+                          "\nPor: [{username}]({user_url})\nAtualmente,"\
+                          " o estado dele é: {state}.\nVocê pode visualizar"\
+                          " o comentário clicando [aqui]({review_url})."\
+                          .format(title=title,
+                                  pull_request_url=pull_request_url,
+                                  username=username, user_url=user_url,
+                                  state=pull_request_state,
+                                  review_url=review_url)
+                bot.send_message(chat_id=chat_id,
+                                 text=message,
+                                 parse_mode='Markdown',
+                                 disable_web_page_preview=True)
         elif req_json["action"] == "review_requested":
             if "pull_request" in list(req_json.keys()):
                 # new review requested
