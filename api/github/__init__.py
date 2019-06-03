@@ -3,6 +3,7 @@ from flask import Flask
 from github.issue.views import issue_blueprint
 from github.user.views import github_blueprint
 from github.branches.views import branches_blueprint
+from github.webhook.views import webhook_blueprint
 from github.pull_request.views import pull_request_blueprint
 from github.contributor_issues.views import contributor_issues_blueprint
 from github.release.views import release_blueprint
@@ -32,7 +33,11 @@ def create_app(script_info=None):
     app.register_blueprint(branches_blueprint)
     app.register_blueprint(pull_request_blueprint)
     app.register_blueprint(release_blueprint)
+<<<<<<< HEAD
     app.register_blueprint(contributor_issues_blueprint)
+=======
+    app.register_blueprint(webhook_blueprint)
+>>>>>>> devel
 
     # shell context for flask cli
     @app.shell_context_processor

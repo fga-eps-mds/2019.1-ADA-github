@@ -21,6 +21,7 @@ services:
       - BOT_NAME=${BOT_NAME}
       - CHAT_ID=${CHAT_ID}
       - GITHUB_API_TOKEN=${GITHUB_API_TOKEN}
+      - GITHUB_SERVICE_URL=${GITHUB_SERVICE_URL}
       - FLASK_APP=github/__init__.py
       - FLASK_ENV=development
       - APP_SETTINGS=github.config.DevelopmentConfig
