@@ -33,11 +33,8 @@ def create_app(script_info=None):
     app.register_blueprint(branches_blueprint)
     app.register_blueprint(pull_request_blueprint)
     app.register_blueprint(release_blueprint)
-<<<<<<< HEAD
     app.register_blueprint(contributor_issues_blueprint)
-=======
     app.register_blueprint(webhook_blueprint)
->>>>>>> devel
 
     # shell context for flask cli
     @app.shell_context_processor

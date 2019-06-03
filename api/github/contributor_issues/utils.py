@@ -1,6 +1,7 @@
 import requests
 from requests.exceptions import HTTPError
 import json
+import sys
 
 
 class ContributorIssues():
@@ -35,27 +36,3 @@ class ContributorIssues():
                     "issue_number": issue_info["number"]
                 })
             return issues_info
-
-    def get_project_fullname(self, project_name):
-        headers = {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer " + self.GITHUB_TOKEN
-        }
-        try:
-            response = requests.get(
-                "https://api.github.com/user/repos",
-                headers=headers)
-
-            response.raise_for_status()
-        except HTTPError as http_error:
-            dict_error = {"status_code": http_error.response.status_code}
-            raise HTTPError(json.dumps(dict_error))
-
-        else:
-            repositories = response.json()
-            for item in repositories:
-                if(item["name"] == project_name):
-                    owner_and_repo = item["full_name"]
-                    break
-
-        return owner_and_repo
