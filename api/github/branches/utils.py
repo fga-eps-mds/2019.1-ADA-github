@@ -11,7 +11,7 @@ class Branch(GitHubUtils):
     def get_branches_names(self, project_owner, project_name):
         url = self.GITHUB_API_URL + self.project_owner_project_name(
             project_owner, project_name, "branches")
-        requested_branches = self.get_request(url)
+        requested_branches = self.request_url(url, "get")
         project_branches = self.branches_requested_branches(requested_branches)
         return project_branches
 
@@ -27,7 +27,7 @@ class Branch(GitHubUtils):
                                             project_owner=project_owner,
                                             project_name=project_name,
                                             branch_name=branch_name["name"])
-            requested_dates = self.get_request(url)
+            requested_dates = self.request_url(url, "get")
             branches_data["name"] = branch_name["name"]
             commit_days = self.get_last_commit_days(
                 requested_dates["commit"]

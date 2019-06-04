@@ -31,9 +31,13 @@ class GitHubUtils:
         else:
             return jsonify(NOT_FOUND), 404
 
-    def get_request(self, url):
+    def request_url(self, url, request_type, data=None):
         try:
-            response = requests.get(url, headers=self.headers)
+            if request_type == "get":
+                response = requests.get(url, headers=self.headers)
+            elif request_type == "post":
+                response = requests.post(url, headers=self.headers,
+                                        data=json.dumps(data))
             response.raise_for_status()
         except HTTPError as http_error:
             raise HTTPError(self.exception_json(http_error.
@@ -55,23 +59,6 @@ class GitHubUtils:
         raw_class_name = str(type(object)).split('.')[-1]
         class_name = re.sub('[^a-zA-Z]+', '', raw_class_name)
         return class_name
-
-    def post_request(self, url, data):
-        try:
-            response = requests.post(url, headers=self.headers,
-                                     data=json.dumps(data))
-            response.raise_for_status()
-        except HTTPError as http_error:
-            raise HTTPError(self.exception_json(http_error.
-                                                response.
-                                                status_code))
-        except AttributeError:
-            raise AttributeError(self.exception_json(404))
-        except IndexError:
-            raise IndexError(self.exception_json(404))
-        else:
-            resp_json = response.json()
-            return resp_json
 
     def project_owner_project_name(self, project_owner, project_name, name):
         url = "repos/{project_owner}/{project_name}/"\

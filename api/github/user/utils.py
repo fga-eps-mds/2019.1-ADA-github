@@ -25,7 +25,7 @@ class UserInfo(GitHubUtils):
         url = self.GITHUB_API_URL + "user?access_token="\
                                     "{access_token}".format(
                                      access_token=self.GITHUB_API_TOKEN)
-        requested_user = self.get_request(url)
+        requested_user = self.request_url(url, "get")
         github_data = {"github_username": requested_user["login"],
                        "github_user_id": requested_user["id"]}
         return github_data
@@ -37,7 +37,7 @@ class UserInfo(GitHubUtils):
                                     "{access_token}".format(
                                      login=username, access_token=self
                                      .GITHUB_API_TOKEN)
-        requested_repositories = self.get_request(url)
+        requested_repositories = self.request_url(url, "get")
         project_repositories = self.repository_requested_repository(
                                     requested_repositories)
         return project_repositories
