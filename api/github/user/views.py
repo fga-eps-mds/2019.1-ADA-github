@@ -48,8 +48,10 @@ def get_repositories(chat_id):
         if len(user_repos) == 0:
             return jsonify(NOT_FOUND), 404
     except HTTPError as http_error:
-        user.error_message(http_error)
+        return user.error_message(http_error)
     except IndexError:
+        return jsonify(NOT_FOUND), 404
+    except AttributeError:
         return jsonify(NOT_FOUND), 404
     else:
         return jsonify(
@@ -64,8 +66,8 @@ def register_repository(chat_id):
     try:
         user = UserInfo(chat_id)
         user.register_repo(repo_name)
-    except HTTPError as http_error:
-        user.error_message(http_error)
+    except AttributeError:
+        return jsonify(NOT_FOUND), 404
     else:
         return jsonify({
             "status": "OK"

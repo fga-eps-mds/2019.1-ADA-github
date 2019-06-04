@@ -24,7 +24,7 @@ def create_issue(chat_id):
         create_issue = issue.create_issue(project.name, user.github_user,
                                           title, body)
     except HTTPError as http_error:
-        user.error_message(http_error)
+        return issue.error_message(http_error)
     except AttributeError:
         return jsonify(NOT_FOUND), 404
     else:

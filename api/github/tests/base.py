@@ -6,7 +6,6 @@ from github.data import init_db
 import os
 from github.data.user import User
 from github.data.project import Project
-import sys
 
 
 class BaseTestCase(TestCase):

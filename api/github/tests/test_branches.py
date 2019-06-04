@@ -1,15 +1,11 @@
 import json
 from github.tests.base import BaseTestCase
 from github.tests.jsonschemas.branches.schemas import\
-    ping_schema, unauthorized_schema, not_found_schema,\
+    unauthorized_schema, not_found_schema,\
     valid_branches_names_schema, invalid_project_schema
 from jsonschema import validate
 from github.branches.utils import Branch
-from github.data.user import User
-from github.data.project import Project
 from requests.exceptions import HTTPError
-import os
-import sys
 
 
 class TestBranches(BaseTestCase):

@@ -20,7 +20,7 @@ def get_pull_request(chat_id):
         pull_request_data = pull_request.get_pull_requests(user.github_user,
                                                            project_pr.name)
     except HTTPError as http_error:
-        user.error_message(http_error)
+        return pull_request.error_message(http_error)
     except AttributeError:
         return jsonify(NOT_FOUND), 404
     else:

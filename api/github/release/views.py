@@ -17,7 +17,7 @@ def get_releases(chat_id):
         release = Release(chat_id, user.github_user, project_release.name)
         release_data = release.get_last_release()
     except HTTPError as http_error:
-        user.error_messages(http_error)
+        return release.error_message(http_error)
     except AttributeError:
         return jsonify(NOT_FOUND), 404
     else:
