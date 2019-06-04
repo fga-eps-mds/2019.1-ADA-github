@@ -7,8 +7,10 @@ class PullRequest(GitHubUtils):
         super().__init__(chat_id)
 
     def get_pull_requests(self, project_owner, project_name):
-        url = self.GITHUB_API_URL + self.project_owner_project_name(
-                                    project_owner, project_name, "pulls")
+        url = self.GITHUB_API_URL + "repos/{project_owner}"\
+                                    "/{project_name}/pulls".format(
+                                     project_owner=project_owner,
+                                     project_name=project_name)
         requested_pull_requests = self.get_request(url)
         project_pull_request = self.pull_requested_pull(
                                     requested_pull_requests)
