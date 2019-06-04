@@ -33,10 +33,8 @@ class UserInfo(GitHubUtils):
     def get_repositories(self):
         requested_username = self.get_own_user_data()
         username = requested_username["github_username"]
-        url = self.GITHUB_API_URL + "users/{login}/repos?access_token="\
-                                    "{access_token}".format(
-                                     login=username, access_token=self
-                                     .GITHUB_API_TOKEN)
+        url = self.GITHUB_API_URL + "users/{login}/repos".format(
+                                     login=username)
         requested_repositories = self.request_url(url, "get")
         project_repositories = self.repository_requested_repository(
                                     requested_repositories)
@@ -45,8 +43,9 @@ class UserInfo(GitHubUtils):
     def repository_requested_repository(self, resp):
         repositories = {"repositories": []}
         for i, item in enumerate(resp):
-            repository_data = {"name": 0}
+            repository_data = {"name": 0, "full_name": 0}
             repository_data["name"] = resp[i]['name']
+            repository_data["full_name"] = resp[i]["full_name"]
             repositories["repositories"].append(repository_data)
         return repositories
 
@@ -55,9 +54,9 @@ class UserInfo(GitHubUtils):
         buttons = []
         for repositorio in received_repositories["repositories"]:
             buttons.append(telegram.InlineKeyboardButton(
-                text=repositorio["name"],
-                callback_data="meu repositorio do github é " +
-                repositorio["name"]))
+                    text=repositorio["name"],
+                    callback_data="meu repositorio do github é " +
+                                  repositorio["full_name"]))
         repo_names = [buttons[i:i+2] for i in range(0, len(buttons), 2)]
         return repo_names
 
