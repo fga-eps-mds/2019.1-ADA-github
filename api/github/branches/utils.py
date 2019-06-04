@@ -10,7 +10,7 @@ class Branch(GitHubUtils):
 
     def get_branches_names(self, project_owner, project_name):
         url = self.GITHUB_API_URL + self.project_owner_project_name(
-                                    project_owner, project_name, "branches")
+            project_owner, project_name, "branches")
         requested_branches = self.get_request(url)
         project_branches = self.branches_requested_branches(requested_branches)
         return project_branches
@@ -18,7 +18,7 @@ class Branch(GitHubUtils):
     def get_date_last_commit_branches(self,  project_name, project_owner):
         branches_dict = {"branches": []}
         branches_names = self.get_branches_names(
-                            project_name, project_owner)
+            project_owner, project_name)
         for i, branch_name in enumerate(branches_names["branches"]):
             branches_data = {"name": 0, "last_commit_days": 0}
             url = self.GITHUB_API_URL + "repos/{project_owner}/"\
@@ -30,8 +30,8 @@ class Branch(GitHubUtils):
             requested_dates = self.get_request(url)
             branches_data["name"] = branch_name["name"]
             commit_days = self.get_last_commit_days(
-                                        requested_dates["commit"]
-                                        ["commit"]["author"]["date"])
+                requested_dates["commit"]
+                ["commit"]["author"]["date"])
             branches_data["last_commit_days"] = commit_days
             branches_dict["branches"].append(branches_data)
         return branches_dict
