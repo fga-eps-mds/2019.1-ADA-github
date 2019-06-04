@@ -18,18 +18,18 @@ def get_branches(command, chat_id):
         branch = Branch(chat_id)
         if command == "names":
             branches_data = branch.get_branches_names(
-                                user.github_user, project.name)
-        else:
+                user.github_user, project.name)
+        elif command == "datecommits":
             branches_data = branch.get_date_last_commit_branches(
-                            project.name, user.github_user)
+                project.name, user.github_user)
     except HTTPError as http_error:
-        user.error_message(http_error)
+        return branch.error_message(http_error)
     except AttributeError:
         return jsonify(NOT_FOUND), 404
     else:
         return jsonify(
             branches_data
-            ), 200
+        ), 200
 
 
 # @branches_blueprint.route("/branches/names/<chat_id>", methods=["GET"])

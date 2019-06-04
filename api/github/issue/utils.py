@@ -21,7 +21,7 @@ class Issue(GitHubUtils):
                                         username=username,
                                         repository_name=repository_name)
 
-        requested_issue = self.post_request(url, data)
+        requested_issue = self.request_url(url, "post", data)
         issue_dict = {"title": requested_issue["title"],
                       "body": requested_issue["body"],
                       "html_url": requested_issue["html_url"]}

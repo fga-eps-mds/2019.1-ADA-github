@@ -11,7 +11,7 @@ class PullRequest(GitHubUtils):
                                     "/{project_name}/pulls".format(
                                      project_owner=project_owner,
                                      project_name=project_name)
-        requested_pull_requests = self.get_request(url)
+        requested_pull_requests = self.request_url(url, "get")
         project_pull_request = self.pull_requested_pull(
                                     requested_pull_requests)
         return project_pull_request
