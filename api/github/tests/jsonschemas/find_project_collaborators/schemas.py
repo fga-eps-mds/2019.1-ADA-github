@@ -62,3 +62,13 @@ not_found_schema = {
         },
     "required": ["message", "status_code"]
 }
+
+collaborators_valid_schema = {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "Collaborators response schema",
+    "type": "object",
+    "properties": {
+            "collaborators": {"type": "array"}
+        },
+    "required": ["collaborators"]
+}
