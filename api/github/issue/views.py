@@ -20,8 +20,9 @@ def create_issue(chat_id):
         user = User.objects(chat_id=chat_id).first()
         project = Project()
         project = user.project
+        project = project.name.split("/")
         issue = Issue(chat_id)
-        create_issue = issue.create_issue(project.name, user.github_user,
+        create_issue = issue.create_issue(project[-1], user.github_user,
                                           title, body)
     except HTTPError as http_error:
         return issue.error_message(http_error)

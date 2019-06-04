@@ -16,9 +16,10 @@ def get_pull_request(chat_id):
     try:
         user = User.objects(chat_id=chat_id).first()
         project_pr = user.project
+        project_pr = project_pr.name.split("/")
         pull_request = PullRequest(chat_id)
         pull_request_data = pull_request.get_pull_requests(user.github_user,
-                                                           project_pr.name)
+                                                           project_pr[-1])
     except HTTPError as http_error:
         return pull_request.error_message(http_error)
     except AttributeError:
