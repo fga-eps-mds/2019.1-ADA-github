@@ -1,6 +1,6 @@
 from flask import jsonify, Blueprint, request
 from flask_cors import CORS
-from github.branches.error_messages import NOT_FOUND, UNAUTHORIZED
+from github.branches.error_messages import NOT_FOUND
 from requests.exceptions import HTTPError
 from github.webhook.webhook_utils import Webhook
 import json
@@ -23,12 +23,10 @@ def set_webhook():
         webhook = Webhook(chat_id)
         webhook.set_webhook(owner, repo)
     except HTTPError as http_error:
-        dict_message = json.loads(str(http_error))
-        if dict_message["status_code"] == 401:
-            return jsonify(UNAUTHORIZED), 401
-        else:
-            return jsonify(NOT_FOUND), 404
+        return webhook.error_message(http_error)
     except AttributeError:
+        return jsonify(NOT_FOUND), 404
+    except KeyError:
         return jsonify(NOT_FOUND), 404
     else:
         return jsonify({
@@ -46,11 +44,7 @@ def delete_webhook():
         webhook = Webhook(chat_id)
         webhook.delete_hook(owner, repo)
     except HTTPError as http_error:
-        dict_message = json.loads(str(http_error))
-        if dict_message["status_code"] == 401:
-            return jsonify(UNAUTHORIZED), 401
-        else:
-            return jsonify(NOT_FOUND), 404
+        return webhook.error_message(http_error)
     except AttributeError:
         return jsonify(NOT_FOUND), 404
     else:
@@ -66,6 +60,7 @@ def webhook_notification(chat_id):
     print("#"*30, file=sys.stderr)
 
     req_json = request.json
+    print("x"*30, req_json, file=sys.stderr)
     try:
         bot = telegram.Bot(token=ACCESS_TOKEN)
         if req_json["action"] == "opened":

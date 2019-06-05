@@ -1,6 +1,5 @@
-import json
 from github.utils.github_utils import GitHubUtils
-from requests.exceptions import HTTPError
+
 
 class FindProjectCollaborators(GitHubUtils):
 

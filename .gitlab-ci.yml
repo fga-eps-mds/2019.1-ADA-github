@@ -51,7 +51,7 @@ build ada-github-homolog:
     - docker login -u $DOCKER_USER -p $DOCKER_PASS
     - docker push $ADA_GITHUB_IMAGE:homolog
   only:
-    - /devel/
+    - /RefatorarGithub/
 
 #############################################################
 ################## BUILD PROD ###############################
@@ -85,7 +85,7 @@ deploy ada-github-homolog:
             --stack $RANCHER_HOMOLOG_STACK
             --service ada-github-homolog"
   only:
-    - /devel/
+    - /RefatorarGithub/
 
 #############################################################
 ################## DEPLOY PROD ##############################
