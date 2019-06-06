@@ -4,7 +4,6 @@ from github.branches.error_messages import NOT_FOUND
 from requests.exceptions import HTTPError
 from github.webhook.webhook_utils import Webhook
 import json
-import sys
 import os
 import telegram
 
@@ -55,12 +54,7 @@ def delete_webhook():
 
 @webhook_blueprint.route("/github/webhooks/<chat_id>", methods=["POST"])
 def webhook_notification(chat_id):
-    print("#"*30, file=sys.stderr)
-    print(request.data, file=sys.stderr)
-    print("#"*30, file=sys.stderr)
-
     req_json = request.json
-    print("x"*30, req_json, file=sys.stderr)
     try:
         bot = telegram.Bot(token=ACCESS_TOKEN)
         if req_json["action"] == "opened":

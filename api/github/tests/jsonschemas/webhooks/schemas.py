@@ -19,3 +19,13 @@ not_found_schema = {
         },
     "required": ["message", "status_code"]
 }
+
+key_error_notificaions_schema = {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "Notification response schema",
+    "type": "object",
+    "properties": {
+            "failed": {"type": "string"}
+        },
+    "required": ["failed"]
+}

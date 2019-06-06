@@ -6,7 +6,7 @@ from github.data.user import User
 from github.utils.error_messages import UNAUTHORIZED,\
     NOT_FOUND
 import json
-import requests
+from requests import get, post
 import re
 
 
@@ -34,10 +34,10 @@ class GitHubUtils:
     def request_url(self, url, request_type, data=None):
         try:
             if request_type == "get":
-                response = requests.get(url, headers=self.headers)
+                response = get(url, headers=self.headers)
             elif request_type == "post":
-                response = requests.post(url, headers=self.headers,
-                                         data=json.dumps(data))
+                response = post(url, headers=self.headers,
+                                data=json.dumps(data))
             else:
                 raise AttributeError(self.exception_json(404))
             response.raise_for_status()

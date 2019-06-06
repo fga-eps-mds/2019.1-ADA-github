@@ -25,7 +25,7 @@ class TestUser(BaseTestCase):
         chat_id = self.user.chat_id
         response = self.client.get("/user/github/authorize/{chat_id}"
                                    .format(chat_id=chat_id))
-        self.assertEquals(response.status_code, 302)
+        self.assertEqual(response.status_code, 302)
 
     def invalid_test_view_get_access_token(self):
         chat_id = "12"
@@ -34,7 +34,7 @@ class TestUser(BaseTestCase):
         data = response.data.decode()
         user_string = json.dumps(view_get_access_token_schema)
         user_json = json.loads(user_string)
-        self.assertEquals(response.status_code, 302)
+        self.assertEqual(response.status_code, 302)
         validate(data, user_json)
 
     def test_view_get_repos(self):
