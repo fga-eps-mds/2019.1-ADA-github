@@ -35,11 +35,9 @@ class GitHubUtils:
         try:
             if request_type == "get":
                 response = get(url, headers=self.headers)
-            elif request_type == "post":
+            if request_type == "post":
                 response = post(url, headers=self.headers,
                                 data=json.dumps(data))
-            else:
-                raise AttributeError(self.exception_json(404))
             response.raise_for_status()
         except HTTPError as http_error:
             raise HTTPError(self.exception_json(http_error.

@@ -27,8 +27,7 @@ class Webhook(GitHubUtils):
     def set_webhook(self, owner, repo):
         set_webhook_url = self.GITHUB_API_URL + \
             "repos/{owner}/{repo}/hooks".format(owner=owner, repo=repo)
-        self.request_url(set_webhook_url, "post",
-                         self.webhook_json)
+        self.request_url(set_webhook_url, "post", self.webhook_json)
 
     def delete_hook(self, owner, repo):
         hook_url = self.GITHUB_API_URL + "repos/{owner}/{repo}/"\
