@@ -15,14 +15,14 @@ ACCESS_TOKEN = os.getenv("ACCESS_TOKEN", "")
 @webhook_blueprint.route("/webhook", methods=["POST"])
 def set_webhook():
     try:
-        post_json = json.loads(request.data)
-        chat_id = post_json["chat_id"]
-        owner = post_json["owner"]
-        repo = post_json["repo"]
-        webhook = Webhook(chat_id)
-        webhook.set_webhook(owner, repo)
+
+        post_create_json = json.loads(request.data)
+        webhook_create = Webhook(post_create_json["chat_id"])
+        create_dict = webhook_create.get_post_info(post_create_json)
+        webhook_create.set_webhook(create_dict["owner"],
+                                   create_dict["repo"])
     except HTTPError as http_error:
-        return webhook.error_message(http_error)
+        return webhook_create.error_message(http_error)
     except AttributeError:
         return jsonify(NOT_FOUND), 404
     except KeyError:
@@ -54,17 +54,17 @@ def delete_webhook():
 
 @webhook_blueprint.route("/github/webhooks/<chat_id>", methods=["POST"])
 def webhook_notification(chat_id):
+    webhook = Webhook(chat_id)
     req_json = request.json
     try:
         bot = telegram.Bot(token=ACCESS_TOKEN)
+        user, user_url, title, number, repo_name = \
+            webhook.get_message_info(req_json)
         if req_json["action"] == "opened":
             if "pull_request" in list(req_json.keys()):  # new pr
-                user = req_json["pull_request"]["user"]["login"]
-                user_url = req_json["pull_request"]["user"]["html_url"]
-                title = req_json["pull_request"]["title"]
                 pr_url = req_json["pull_request"]["html_url"]
-                repo_name = req_json["repository"]["name"]
-                pr_number = req_json["pull_request"]["number"]
+                # repo_name = req_json["repository"]["name"]
+                # pr_number = req_json["pull_request"]["number"]
                 pr_body = req_json["pull_request"]["body"]
                 message = "❕ **Novo pull request aberto** em "\
                           "[{repo_name}#{pr_number} "\
@@ -72,7 +72,7 @@ def webhook_notification(chat_id):
                           "por [{user}]({user_url})\n"\
                           "{pr_body}"\
                           .format(repo_name=repo_name,
-                                  pr_number=pr_number,
+                                  pr_number=number,
                                   title=title,
                                   pr_url=pr_url,
                                   user=user,
@@ -82,18 +82,13 @@ def webhook_notification(chat_id):
                                  parse_mode='Markdown',
                                  disable_web_page_preview=True)
             elif "issue" in list(req_json.keys()):  # new issue
-                user = req_json["issue"]["user"]["login"]
-                user_url = req_json["issue"]["user"]["html_url"]
-                title = req_json["issue"]["title"]
                 issue_url = req_json["issue"]["html_url"]
-                repo_name = req_json["repository"]["name"]
-                issue_number = req_json["issue"]["number"]
                 message = "❇ **Nova issue aberta** em "\
                           "[{repo_name}#{issue_number} "\
                           "{title}]({issue_url})\n"\
                           "por [{user}]({user_url})."\
                           .format(repo_name=repo_name,
-                                  issue_number=issue_number,
+                                  issue_number=number,
                                   user=user,
                                   user_url=user_url,
                                   title=title,
@@ -107,20 +102,15 @@ def webhook_notification(chat_id):
                 pass
             if "issue" in list(req_json.keys()):
                 # new issue comment
-                user = req_json["issue"]["user"]["login"]
-                user_url = req_json["issue"]["user"]["html_url"]
-                title = req_json["issue"]["title"]
-                comment_url = req_json["comment"]["html_url"]
-                comment_body = req_json["comment"]["body"]
-                repo_name = req_json["repository"]["name"]
-                issue_number = req_json["issue"]["number"]
+                comment_url, comment_body = \
+                    webhook.get_body_and_body_url(req_json)
                 message = "💬 **Novo comentário** em "\
                           "[{repo_name}#{issue_number} "\
                           "{title}]({comment_url})\n"\
                           "por [{user}]({user_url})\n"\
                           "{comment_body}"\
                           .format(repo_name=repo_name,
-                                  issue_number=issue_number,
+                                  issue_number=number,
                                   user=user,
                                   user_url=user_url,
                                   title=title,
@@ -136,16 +126,9 @@ def webhook_notification(chat_id):
         elif req_json["action"] == "review_requested":
             if "pull_request" in list(req_json.keys()):
                 # new review requested
-                user = req_json["pull_request"]["user"]["login"]
-                user_url = req_json["pull_request"]["user"]["html_url"]
-                title = req_json["pull_request"]["title"]
                 pr_url = req_json["pull_request"]["html_url"]
-                pr_number = req_json["pull_request"]["number"]
-                repo_name = req_json["repository"]["name"]
                 reviewer = ""
-                reviewer += "[" + (req_json["pull_request"]
-                                           ["requested_reviewers"]
-                                           [0]["login"]) + "]"
+                reviewer += webhook.get_reviewer_login(req_json)
                 reviewer += "(" + (req_json["pull_request"]
                                            ["requested_reviewers"]
                                            [0]["html_url"]) + ")"
@@ -155,7 +138,7 @@ def webhook_notification(chat_id):
                           "[{repo_name}#{pr_number}"\
                           "{title}]({pr_url})."\
                           .format(repo_name=repo_name,
-                                  pr_number=pr_number,
+                                  pr_number=number,
                                   title=title,
                                   reviewer=reviewer,
                                   pr_url=pr_url,
