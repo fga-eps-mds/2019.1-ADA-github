@@ -5,7 +5,7 @@ from requests.exceptions import HTTPError
 from github.webhook.webhook_utils import Webhook
 import json
 import os
-import telegram
+from telegram import Bot
 
 webhook_blueprint = Blueprint("webhook", __name__)
 CORS(webhook_blueprint)
@@ -57,14 +57,12 @@ def webhook_notification(chat_id):
     webhook = Webhook(chat_id)
     req_json = request.json
     try:
-        bot = telegram.Bot(token=ACCESS_TOKEN)
+        bot = Bot(token=ACCESS_TOKEN)
         user, user_url, title, number, repo_name = \
             webhook.get_message_info(req_json)
         if req_json["action"] == "opened":
             if "pull_request" in list(req_json.keys()):  # new pr
                 pr_url = req_json["pull_request"]["html_url"]
-                # repo_name = req_json["repository"]["name"]
-                # pr_number = req_json["pull_request"]["number"]
                 pr_body = req_json["pull_request"]["body"]
                 message = "❕ **Novo pull request aberto** em "\
                           "[{repo_name}#{pr_number} "\

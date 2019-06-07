@@ -7,7 +7,7 @@ from github.tests.jsonschemas.webhooks.schemas import\
     set_webhook_schema, not_found_schema,\
     key_error_notificaions_schema
 from jsonschema import validate
-from unittest.mock import patch
+from unittest.mock import patch, Mock
 
 ACCESS_TOKEN = os.environ.get("ACCESS_TOKEN", "")
 GITHUB_API_TOKEN = os.environ.get("GITHUB_API_TOKEN", "")
@@ -21,8 +21,11 @@ class TestWebhook(BaseTestCase):
             "Content-Type": "applications/json"
         }
 
+    @patch('github.webhook.views.Bot')
     @patch('github.utils.github_utils.post')
-    def test_view_delete_hook(self, mocked_post):
+    def test_view_delete_hook(self, mocked_post, mocked_bot):
+        mocked_bot.return_value = Mock()
+        mocked_bot.send_message = Mock()
         mocked_post.response = {}
         user_data = {
             "chat_id": self.user.chat_id,
@@ -35,8 +38,11 @@ class TestWebhook(BaseTestCase):
         self.assertEqual(response.status_code, 200)
         validate(data, set_webhook_schema)
 
+    @patch('github.webhook.views.Bot')
     @patch('github.utils.github_utils.post')
-    def test_view_register_user(self, mocked_post):
+    def test_view_register_user(self, mocked_post, mocked_bot):
+        mocked_bot.return_value = Mock()
+        mocked_bot.send_message = Mock()
         mocked_post.response = {}
         user_data = {
             "chat_id": self.user.chat_id,
@@ -60,8 +66,11 @@ class TestWebhook(BaseTestCase):
         self.assertEqual(response.status_code, 404)
         validate(data, not_found_schema)
 
+    @patch('github.webhook.views.Bot')
     @patch('github.webhook.views.request')
-    def test_view_new_comment_issue(self, mocked_request):
+    def test_view_new_comment_issue(self, mocked_request, mocked_bot):
+        mocked_bot.return_value = Mock()
+        mocked_bot.send_message = Mock()
         mocked_request.json = {
                 "action": "created",
                 "issue": {
@@ -90,8 +99,11 @@ class TestWebhook(BaseTestCase):
         self.assertEqual(response.status_code, 200)
         validate(data, set_webhook_schema)
 
+    @patch('github.webhook.views.Bot')
     @patch('github.webhook.views.request')
-    def test_view_new_pull_request(self, mocked_request):
+    def test_view_new_pull_request(self, mocked_request, mocked_bot):
+        mocked_bot.return_value = Mock()
+        mocked_bot.send_message = Mock()
         mocked_request.json = {
             "action": "opened",
             "number": 2,
@@ -120,7 +132,10 @@ class TestWebhook(BaseTestCase):
         validate(data, set_webhook_schema)
 
     @patch('github.webhook.views.request')
-    def test_view_new_issue(self, mocked_request):
+    @patch('github.webhook.views.request')
+    def test_view_new_issue(self, mocked_request, mocked_bot):
+        mocked_bot.return_value = Mock()
+        mocked_bot.send_message = Mock()
         mocked_request.json = {
             "action": "opened",
             "number": 2,
@@ -147,7 +162,11 @@ class TestWebhook(BaseTestCase):
         validate(data, set_webhook_schema)
 
     @patch('github.webhook.views.request')
-    def test_view_pull_request_review_comment(self, mocked_request):
+    @patch('github.webhook.views.request')
+    def test_view_pull_request_review_comment(self, mocked_request,
+                                              mocked_bot):
+        mocked_bot.return_value = Mock()
+        mocked_bot.send_message = Mock()
         mocked_request.json = {
             "action": "created",
             "pull_request_review_comment": "test"
@@ -160,7 +179,10 @@ class TestWebhook(BaseTestCase):
         validate(data, set_webhook_schema)
 
     @patch('github.webhook.views.request')
-    def test_view_review(self, mocked_request):
+    @patch('github.webhook.views.request')
+    def test_view_review(self, mocked_request, mocked_bot):
+        mocked_bot.return_value = Mock()
+        mocked_bot.send_message = Mock()
         mocked_request.json = {
             "action": "submitted",
             "review": "test"
@@ -173,7 +195,10 @@ class TestWebhook(BaseTestCase):
         validate(data, set_webhook_schema)
 
     @patch('github.webhook.views.request')
-    def test_view_review_requested(self, mocked_request):
+    @patch('github.webhook.views.request')
+    def test_view_review_requested(self, mocked_request, mocked_bot):
+        mocked_bot.return_value = Mock()
+        mocked_bot.send_message = Mock()
         mocked_request.json = {
             "action": "review_requested",
             "number": 2,
