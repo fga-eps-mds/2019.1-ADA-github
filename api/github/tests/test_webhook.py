@@ -74,10 +74,15 @@ class TestWebhook(BaseTestCase):
         mocked_request.json = {
                 "action": "created",
                 "issue": {
+                    "html_url": "https://github.com/Codertocat/Hello-World/"
+                                "issues/"
+                                "1#issuecomment-492700400",
                     "user": {
                         "login": "Codertocat",
                         "html_url": "https://github.com/Codertocat"
                     },
+                    "body": "You are totally right! I'll get this"
+                            " fixed right away.",
                     "title": "Spelling error in the README file",
                     "number": 1
                     },
@@ -131,6 +136,37 @@ class TestWebhook(BaseTestCase):
         self.assertEqual(response.status_code, 200)
         validate(data, set_webhook_schema)
 
+    @patch('github.webhook.views.Bot')
+    @patch('github.webhook.views.request')
+    def test_view_new_pull_request_comment(self, mocked_request, mocked_bot):
+        mocked_bot.return_value = Mock()
+        mocked_bot.send_message = Mock()
+        mocked_request.json = {
+            "action": "submitted",
+            "review": {
+                "user": {
+                    "login": "Codertocat",
+                    "html_url": "https://github.com/Codertocat"
+                },
+                "body": "This is a pretty simple change that we need to pull"
+                        " into master.",
+                "state": "approved"
+                },
+            "pull_request": {
+                "html_url": "https://github.com/Codertocat/Hello-World/pull/2",
+                "title": "Update the README with new information."
+            },
+            "repository": {
+                "name": "Hello-World"
+            }
+        }
+        response = self.client.post("/github/webhooks/{chat_id}"
+                                    .format(chat_id=self.user.chat_id),
+                                    headers=self.headers)
+        data = json.loads(response.data.decode())
+        self.assertEqual(response.status_code, 200)
+        validate(data, set_webhook_schema)
+
     @patch('github.webhook.views.request')
     @patch('github.webhook.views.request')
     def test_view_new_issue(self, mocked_request, mocked_bot):
@@ -145,6 +181,8 @@ class TestWebhook(BaseTestCase):
                 "html_url": "https://github.com/Codertocat/Hello-World/pull/2",
                 "number": 2,
                 "title": "Update the README with new information.",
+                "body": "You are totally right! I'll get this"
+                            " fixed right away.",
                 "user": {
                     "login": "Codertocat",
                     "html_url": "https://github.com/Codertocat"
