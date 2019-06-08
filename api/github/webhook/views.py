@@ -116,22 +116,24 @@ def webhook_notification(chat_id):
         elif req_json["action"] == "submitted":
             if "review" in list(req_json.keys()):
                 # new reviewed pr
+                pull_request_name = "[{title}]({url})".format(
+                                    title=dict_message["title"],
+                                    url=dict_message["url"])
                 if req_json["review"]["state"] == "approved":
-                    review_state = "✅Um pull request foi aprovado! \n"
+                    review_state = "✅ Pull request " + pull_request_name +\
+                                   " aprovado"
                 elif req_json["review"]["state"] == "changes_requested":
-                    review_state = " ❗️Mudanças foram solicitadas em um Pull"\
-                                    " Request.\n"
+                    review_state = " ❗️Mudanças solicitadas no pull request" +\
+                                    " " + pull_request_name
                 else:
-                    review_state = "💬 **Nova revisão em Pull Request**\n"
-                message = review_state + \
-                    "Nome do Pull Request: [{title}]({url})"\
-                    ", por: [@{username}]({user_url})\n"\
-                    .format(title=dict_message["title"],
-                            url=dict_message["url"],
-                            username=dict_message["user"],
-                            user_url=dict_message["user_url"])
-                message += '"{review_body}"'.format(review_body=dict_message
-                                                    ["body"])
+                    review_state = "💬 Pull request " + pull_request_name +\
+                                   "revisado"
+                message = review_state + " por [@{username}]({user_url})\n\n"\
+                                         .format(username=dict_message["user"],
+                                                 user_url=dict_message
+                                                 ["user_url"])
+                message += '{review_body}'.format(review_body=dict_message
+                                                  ["body"])
                 bot.send_message(chat_id=chat_id,
                                  text=message,
                                  parse_mode='Markdown',
