@@ -41,3 +41,13 @@ not_found_user_schema = {
         },
     "required": ["status_code"]
 }
+
+comment_issue_schema = {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "User response schema",
+    "type": "object",
+    "properties": {
+            "body": {"type": "string"}
+        },
+    "required": ["body"]
+}
