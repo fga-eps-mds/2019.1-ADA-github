@@ -117,12 +117,12 @@ def webhook_notification(chat_id):
             if "review" in list(req_json.keys()):
                 # new reviewed pr
                 if req_json["review"]["state"] == "approved":
-                    review_state = "Um pull request foi aprovado! ✅\n"
+                    review_state = "✅Um pull request foi aprovado! \n"
                 elif req_json["review"]["state"] == "changes_requested":
-                    review_state = "Mudanças foram solicitadas em um Pull"\
-                                    " Request. ❗️\n"
+                    review_state = " ❗️Mudanças foram solicitadas em um Pull"\
+                                    " Request.\n"
                 else:
-                    review_state = "💬 **Nova revisão em Pull Request**"
+                    review_state = "💬 **Nova revisão em Pull Request**\n"
                 message = review_state + \
                     "Nome do Pull Request: [{title}]({url})"\
                     ", por: [@{username}]({user_url})\n"\

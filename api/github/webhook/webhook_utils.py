@@ -92,8 +92,8 @@ class Webhook(GitHubUtils):
     def get_reviewer_login(self, req_json):
         reviewer = (req_json["pull_request"]
                             ["requested_reviewers"]
-                            [0]["html_url"])
-        reviewer_message = "("+reviewer+")"
+                            [0]["login"])
+        reviewer_message = "["+reviewer+"]"
         return reviewer_message
 
     def get_body_and_body_url(self, req_json):
