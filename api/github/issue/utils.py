@@ -26,7 +26,7 @@ class Issue(GitHubUtils):
                       "body": requested_issue["body"],
                       "html_url": requested_issue["html_url"]}
         return issue_dict
-    
+
     def comment_issue(self, repository_name, username, issue_number, body):
 
         data = {

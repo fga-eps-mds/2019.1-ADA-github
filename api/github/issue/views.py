@@ -39,23 +39,24 @@ def create_issue(chat_id):
 
 @issue_blueprint.route("/api/comment_issue/<chat_id>", methods=["POST"])
 def comment_issue(chat_id):
-    # try:
-    response = request.get_json()
-    body = response['body']
-    issue_number = response['issue_number']
-    user = User.objects(chat_id=chat_id).first()
-    project = Project()
-    project = user.project
-    project = project.name.split("/")
-    issue = Issue(chat_id)
-    comment_issue = issue.comment_issue(project[-1], user.github_user,
-                                        issue_number, body)
-    # except HTTPError as http_error:
-    #     return issue.error_message(http_error)
-    # except AttributeError:
-    #     return jsonify(NOT_FOUND), 404
-    # else:
-    return jsonify({
-        "body": comment_issue["body"]
-    }
-    ), 200
+    try:
+        response = request.get_json()
+        body = response['body']
+        issue_number = response['issue_number']
+
+        user = User.objects(chat_id=chat_id).first()
+        project = Project()
+        project = user.project
+        project = project.name.split("/")
+        issue = Issue(chat_id)
+        comment_issue = issue.comment_issue(project[-1], user.github_user,
+                                            issue_number, body)
+    except HTTPError as http_error:
+        return issue.error_message(http_error)
+    except AttributeError:
+        return jsonify(NOT_FOUND), 404
+    else:
+        return jsonify({
+            "body": comment_issue["body"]
+        }
+        ), 200
