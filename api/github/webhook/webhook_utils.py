@@ -44,18 +44,42 @@ class Webhook(GitHubUtils):
             req.raise_for_status()
 
     def get_message_info(self, req_json):
-        if "pull_request" in list(req_json.keys()):
+        dict_message = {
+            "user": 0,
+            "user_url": 0,
+            "title": 0,
+            "number": 0,
+            "repo_name": 0,
+            "url": 0,
+            "body": 0,
+        }
+        if "review" in list(req_json.keys()):
+            key = "review"
+            dict_message = self.update_message_keys(key, req_json,
+                                                    dict_message)
+        elif "pull_request" in list(req_json.keys()):
             key = "pull_request"
+            dict_message = self.update_message_keys(key, req_json,
+                                                    dict_message)
         elif "issue" in list(req_json.keys()):
             key = "issue"
-        else:
-            return None, None, None, None, None
-        user = req_json[key]["user"]["login"]
-        user_url = req_json[key]["user"]["html_url"]
-        title = req_json[key]["title"]
-        number = req_json[key]["number"]
-        repo_name = req_json["repository"]["name"]
-        return user, user_url, title, number, repo_name
+            dict_message = self.update_message_keys(key, req_json,
+                                                    dict_message)
+        return dict_message
+
+    def update_message_keys(self, key, req_json, dict_message):
+        dict_message["user"] = req_json[key]["user"]["login"]
+        dict_message["user_url"] = req_json[key]["user"]["html_url"]
+        dict_message["body"] = req_json[key]["body"]
+        if(key == "review"):
+            dict_message["title"] = req_json["pull_request"]["title"]
+            dict_message["url"] = req_json["pull_request"]["html_url"]
+            return dict_message
+        dict_message["title"] = req_json[key]["title"]
+        dict_message["number"] = req_json[key]["number"]
+        dict_message["url"] = req_json[key]["html_url"]
+        dict_message["repo_name"] = req_json["repository"]["name"]
+        return dict_message
 
     def get_post_info(self, post_json):
         dict_infos = {
@@ -68,8 +92,8 @@ class Webhook(GitHubUtils):
     def get_reviewer_login(self, req_json):
         reviewer = (req_json["pull_request"]
                             ["requested_reviewers"]
-                            [0]["html_url"])
-        reviewer_message = "("+reviewer+")"
+                            [0]["login"])
+        reviewer_message = "["+reviewer+"]"
         return reviewer_message
 
     def get_body_and_body_url(self, req_json):
