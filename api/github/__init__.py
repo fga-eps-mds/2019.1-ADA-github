@@ -6,6 +6,8 @@ from github.branches.views import branches_blueprint
 from github.webhook.views import webhook_blueprint
 from github.pull_request.views import pull_request_blueprint
 from github.release.views import release_blueprint
+from github.find_project_collaborators.views import \
+     find_project_collaborators_blueprint
 from flask_cors import CORS
 from flask_mongoengine import MongoEngine
 
@@ -32,6 +34,7 @@ def create_app(script_info=None):
     app.register_blueprint(branches_blueprint)
     app.register_blueprint(pull_request_blueprint)
     app.register_blueprint(release_blueprint)
+    app.register_blueprint(find_project_collaborators_blueprint)
     app.register_blueprint(webhook_blueprint)
 
     # shell context for flask cli

@@ -1,12 +1,10 @@
-import requests
-from requests.exceptions import HTTPError
-import json
+from github.utils.github_utils import GitHubUtils
 
 
-class Issue():
+class Issue(GitHubUtils):
 
-    def __init__(self, GITHUB_TOKEN):
-        self.GITHUB_TOKEN = GITHUB_TOKEN
+    def __init__(self, chat_id):
+        super().__init__(chat_id)
 
     def create_issue(self, repository_name, username, title, body):
 
@@ -17,25 +15,14 @@ class Issue():
                     username
                     ]
                }
-        headers = {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer " + self.GITHUB_TOKEN
-        }
-        try:
-            response = requests.post(
-                "https://api.github.com/repos/{username}/"
-                "{repository_name}/issues".format(username=username,
-                                                  repository_name=(
-                                                      repository_name)),
-                data=json.dumps(data),
-                headers=headers)
-            response.raise_for_status()
-        except HTTPError as http_error:
-            dict_error = {"status_code": http_error.response.status_code}
-            raise HTTPError(json.dumps(dict_error))
-        else:
-            created_issue = response.json()
-            issue_dict = {"title": created_issue["title"],
-                          "body": created_issue["body"],
-                          "html_url": created_issue["html_url"]}
-            return issue_dict
+
+        url = self.GITHUB_API_URL + "repos/{username}/"\
+                                    "{repository_name}/issues".format(
+                                        username=username,
+                                        repository_name=repository_name)
+
+        requested_issue = self.request_url(url, "post", data)
+        issue_dict = {"title": requested_issue["title"],
+                      "body": requested_issue["body"],
+                      "html_url": requested_issue["html_url"]}
+        return issue_dict
