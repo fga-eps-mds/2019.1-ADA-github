@@ -8,7 +8,6 @@ from github.tests.jsonschemas.user.schemas import\
 from jsonschema import validate
 from github.user.utils import UserInfo
 import os
-
 ACCESS_TOKEN = os.environ.get("ACCESS_TOKEN", "")
 GITHUB_API_TOKEN = os.environ.get("GITHUB_API_TOKEN", "")
 
