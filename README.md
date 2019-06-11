@@ -1,8 +1,8 @@
 # ADA GitHub API
 
 ![Ada_logo_horizontal](https://user-images.githubusercontent.com/22121504/56839465-006c8200-6859-11e9-8feb-ad76c573b844.png)
-[![pipeline status](https://gitlab.com/adabot/ada-github/badges/devel/pipeline.svg)](https://gitlab.com/adabot/ada-github/commits/devel)
-[![coverage report](https://gitlab.com/adabot/ada-github/badges/devel/coverage.svg)](https://gitlab.com/adabot/ada-github/commits/devel) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![pipeline status](https://gitlab.com/adabot/ada-github/badges/master/pipeline.svg)](https://gitlab.com/adabot/ada-github/commits/master)
+[![coverage report](https://gitlab.com/adabot/ada-github/badges/master/coverage.svg)](https://gitlab.com/adabot/ada-github/commits/master) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Maintainability](https://api.codeclimate.com/v1/badges/aad68fb92205d309e799/maintainability)](https://codeclimate.com/github/fga-eps-mds/2019.1-ADA-github/maintainability)
 
 ## Sobre o Projeto
@@ -39,7 +39,7 @@ export GITHUB_API_TOKEN='GITHUB_TOKEN'
 Execute o Docker a partir do seguinte comando:
 
 ```sh
-docker-compose -f docker-compose.yml up --build
+docker-compose up --build
 ```
 
 ## Equipe
