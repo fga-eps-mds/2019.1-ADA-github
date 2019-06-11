@@ -47,6 +47,7 @@ class TestIssue(BaseTestCase):
         create_issue_json = json.loads(create_issue_string)
         self.assertEqual(response.status_code, 200)
         validate(data, create_issue_json)
+
     def test_view_comment_issue(self):
         response = self.client.post("/api/comment_issue/"
                                     "{chat_id}".format(
@@ -85,7 +86,6 @@ class TestIssue(BaseTestCase):
         create_issue_json = json.loads(create_issue_string)
         self.assertEqual(response.status_code, 401)
         validate(data, create_issue_json)
-
 
     def test_view_comment_issue_invalid_chat_id(self):
         chat_id = "qweqweqrasd"
