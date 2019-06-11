@@ -2,63 +2,67 @@ from flask import jsonify, Blueprint
 from flask_cors import CORS
 from github.branches.utils import Branch
 from github.data.user import User
-from github.branches.error_messages import NOT_FOUND, UNAUTHORIZED
+from github.branches.error_messages import NOT_FOUND
 from requests.exceptions import HTTPError
-import json
-
 
 branches_blueprint = Blueprint("branches", __name__)
 CORS(branches_blueprint)
 
 
-@branches_blueprint.route("/branches/ping", methods=["GET"])
-def ping_pong():
-    return jsonify({
-        "status": "success",
-        "message": "pong!"
-    }), 200
-
-
-@branches_blueprint.route("/branches/names/<chat_id>", methods=["GET"])
-def get_branches(chat_id):
+@branches_blueprint.route("/branches/<command>/<chat_id>", methods=["GET"])
+def get_branches(command, chat_id):
     try:
         user = User.objects(chat_id=chat_id).first()
         project = user.project
-        branch = Branch(user.access_token)
-        branches_names = branch.get_branches_names(
-                         project.name, user.github_user)
+        project = project.name.split("/")
+        branch = Branch(chat_id)
+        if command == "names":
+            branches_data = branch.get_branches_names(
+                user.github_user, project[-1])
+        elif command == "datecommits":
+            branches_data = branch.get_date_last_commit_branches(
+                project[-1], user.github_user)
     except HTTPError as http_error:
-        dict_message = json.loads(str(http_error))
-        if dict_message["status_code"] == 401:
-            return jsonify(UNAUTHORIZED), 401
-        else:
-            return jsonify(NOT_FOUND), 404
+        return branch.error_message(http_error)
     except AttributeError:
         return jsonify(NOT_FOUND), 404
     else:
         return jsonify(
-            branches_names
-            ), 200
+            branches_data
+        ), 200
 
 
-@branches_blueprint.route("/branches/datecommits/<chat_id>", methods=["GET"])
-def get_commits_dates(chat_id):
-    try:
-        user = User.objects(chat_id=chat_id).first()
-        project = user.project
-        branch = Branch(user.access_token)
-        commits_date = branch.get_date_last_commit_branches(project.name,
-                                                            user.github_user)
+# @branches_blueprint.route("/branches/names/<chat_id>", methods=["GET"])
+# def get_branches(chat_id):
+#     try:
+#         user = User.objects(chat_id=chat_id).first()
+#         project_branches = user.project
+#         branch = Branch(chat_id)
+#         branches_names = branch.get_branches_names(
+#                             user.github_user, project_branches.name)
+#     except HTTPError as http_error:
+#         user.error_message(http_error)
+#     except AttributeError:
+#         return jsonify(NOT_FOUND), 404
+#     else:
+#         return jsonify(
+#             branches_names
+#             ), 200
 
-    except HTTPError as http_error:
-        dict_message = json.loads(str(http_error))
-        if dict_message["status_code"] == 401:
-            return jsonify(UNAUTHORIZED), 401
-        else:
-            return jsonify(NOT_FOUND), 404
-    except AttributeError:
-        return jsonify(NOT_FOUND), 404
-    else:
-        return jsonify(
-            commits_date
-            ), 200
+
+# @branches_blueprint.route("/branches/datecommits/<chat_id>", methods=["GET"])
+# def get_commits_dates(chat_id):
+#     try:
+#         user = User.objects(chat_id=chat_id).first()
+#         project = user.project
+#         branch = Branch(chat_id)
+#         commits_date = branch.get_date_last_commit_branches(project.name,
+#                                                             user.github_user)
+#     except HTTPError as http_error:
+#         user.error_message(http_error)
+#     except AttributeError:
+#         return jsonify(NOT_FOUND), 404
+#     else:
+#         return jsonify(
+#             commits_date
+#             ), 200
