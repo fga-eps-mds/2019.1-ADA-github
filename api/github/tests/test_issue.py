@@ -1,59 +1,34 @@
 import json
-import unittest
 from github.tests.base import BaseTestCase
-from github.tests.jsonschemas.schemas import\
-    ping_schema, create_issue_schema,\
-    not_found_schema, not_found_user_schema
+from github.tests.jsonschemas.issue.schemas import\
+    create_issue_schema, not_found_schema, comment_issue_schema
 from github.issue.utils import Issue
 from jsonschema import validate
-import os
-from github.data.user import User
-from github.data.project import Project
-from requests.exceptions import HTTPError
 
 
 class TestIssue(BaseTestCase):
-    def setup(self):
+    def setUp(self):
         super().setUp()
-        Project.drop_collection()
-        User.drop_collection()
-
-    def test_ping_pong(self):
-        response = self.client.get("/issue/ping")
-        data = json.loads(response.data.decode())
-        ping_string = json.dumps(ping_schema)
-        ping_json = json.loads(ping_string)
-        self.assertEqual(response.status_code, 200)
-        validate(data, ping_json)
+        self.issue = Issue(self.user.chat_id)
+        self.headers = {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + self.user.access_token
+            }
+        self.issue_body = {
+            "title": "Criando uma dsasaasd.",
+            "body": " Teste utilizando JSON post"
+            }
+        self.comment_body = {
+            "body": "Testando classe comment issue",
+            "issue_number": "3"
+            }
 
     def test_view_create_issue(self):
-        GITHUB_API_TOKEN = os.getenv("GITHUB_API_TOKEN", "")
-        issue_body = {
-            "title": "Criando uma issue.",
-            "body": "Teste utilizando JSON post"
-            }
-
-        headers = {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer " + GITHUB_API_TOKEN
-            }
-        project = Project()
-        project.name = "meu-bot"
-        project.save()
-        user = User()
-        user.access_token = GITHUB_API_TOKEN
-        user.github_user = "guilherme-mendes"
-        user.chat_id = "657382654"
-        user.github_user_id = "37874689"
-        user.project = project.id
-        user.save()
         response = self.client.post("/api/new_issue/"
                                     "{chat_id}".format(
-                                     chat_id=user.chat_id),
-                                    headers=headers,
-                                    data=json.dumps(issue_body))
-        User.delete(user)
-        Project.delete(project)
+                                     chat_id=self.user.chat_id),
+                                    headers=self.headers,
+                                    data=json.dumps(self.issue_body))
         data = json.loads(response.data.decode())
         create_issue_string = json.dumps(create_issue_schema)
         create_issue_json = json.loads(create_issue_string)
@@ -62,23 +37,11 @@ class TestIssue(BaseTestCase):
 
     def test_view_create_issue_invalid_chat_id(self):
         chat_id = "abcdefghij"
-        issue_body = {
-            "title": "Criando uma dsasaasd.",
-            "body": " Teste utilizando JSON post"
-            }
-
-        GITHUB_API_TOKEN = os.getenv("GITHUB_API_TOKEN", "")
-        headers = {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer " + GITHUB_API_TOKEN
-            }
-
         response = self.client.post("/api/new_issue/"
                                     "{chat_id}".format(
                                      chat_id=chat_id),
-                                    headers=headers,
-                                    data=json.dumps(issue_body))
-
+                                    headers=self.headers,
+                                    data=json.dumps(self.issue_body))
         data = json.loads(response.data.decode())
         create_issue_string = json.dumps(not_found_schema)
         create_issue_json = json.loads(create_issue_string)
@@ -86,54 +49,54 @@ class TestIssue(BaseTestCase):
         validate(data, create_issue_json)
 
     def test_view_create_issue_invalid_token(self):
-        chat_id = "abcdefghij"
-        issue_body = {
-            "title": "Criando uma dsasaasd.",
-            "body": " Teste utilizando JSON post"
-            }
-
-        GITHUB_API_TOKEN = "123456789"
-        headers = {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer " + GITHUB_API_TOKEN
-            }
-
+        self.user.access_token = "wrong_token"
+        self.user.save()
         response = self.client.post("/api/new_issue/"
                                     "{chat_id}".format(
-                                     chat_id=chat_id),
-                                    headers=headers,
-                                    data=json.dumps(issue_body))
+                                     chat_id=self.user.chat_id),
+                                    headers=self.headers,
+                                    data=json.dumps(self.issue_body))
         data = json.loads(response.data.decode())
         create_issue_string = json.dumps(not_found_schema)
         create_issue_json = json.loads(create_issue_string)
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 401)
         validate(data, create_issue_json)
 
-    def test_utils_create_issue(self):
-        GITHUB_API_TOKEN = os.getenv("GITHUB_API_TOKEN", "")
-        issue = Issue(GITHUB_API_TOKEN)
-        repository_name = "apitest"
-        username = "sudjoao"
-        title = "Test Create Issue"
-        body = " Teste utilizando JSON post"
+    def test_view_comment_issue(self):
+        response = self.client.post("/api/comment_issue/"
+                                    "{chat_id}".format(
+                                     chat_id=self.user.chat_id),
+                                    headers=self.headers,
+                                    data=json.dumps(self.comment_body))
+        data = json.loads(response.data.decode())
+        comment_issue_string = json.dumps(comment_issue_schema)
+        comment_issue_json = json.loads(comment_issue_string)
+        self.assertEqual(response.status_code, 200)
+        validate(data, comment_issue_json)
 
-        created_issue = issue.create_issue(repository_name, username,
-                                           title, body)
-        validate(created_issue, create_issue_schema)
+    def test_view_comment_issue_invalid_chat_id(self):
+        chat_id = "qweqweqrasd"
+        response = self.client.post("/api/comment_issue/"
+                                    "{chat_id}".format(
+                                        chat_id=chat_id),
+                                    headers=self.headers,
+                                    data=json.dumps(self.comment_body))
+        data = json.loads(response.data.decode())
+        comment_issue_string = json.dumps(not_found_schema)
+        comment_issue_json = json.loads(comment_issue_string)
+        self.assertEqual(response.status_code, 404)
+        validate(data, comment_issue_json)
 
-    def test_incorrect_username_utils_create_issue(self):
-        GITHUB_API_TOKEN = os.getenv("GITHUB_API_TOKEN", "")
-        issue = Issue(GITHUB_API_TOKEN)
-        repository_name = "apitest"
-        username = "lalala"
-        title = "Test Create Issue"
-        body = " Teste utilizando JSON post"
-        with self.assertRaises(HTTPError) as context:
-            issue.create_issue(repository_name, username,
-                               title, body)
-        unauthorized_json = json.loads(str(context.exception))
-        validate(unauthorized_json, not_found_user_schema)
-
-
-if __name__ == "__main__":
-    unittest.main()
+    def test_view_comment_issue_invalid_token(self):
+        self.user.access_token = "wrong_token"
+        self.user.save()
+        response = self.client.post("/api/comment_issue/"
+                                    "{chat_id}".format(
+                                        chat_id=self.user.chat_id),
+                                    headers=self.headers,
+                                    data=json.dumps(self.comment_body))
+        data = json.loads(response.data.decode())
+        comment_issue_string = json.dumps(not_found_schema)
+        comment_issue_json = json.loads(comment_issue_string)
+        self.assertEqual(response.status_code, 401)
+        validate(data, comment_issue_json)

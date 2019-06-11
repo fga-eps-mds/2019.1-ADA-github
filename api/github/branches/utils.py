@@ -1,69 +1,40 @@
-import requests
-from requests.exceptions import HTTPError
-import json
+from github.utils.github_utils import GitHubUtils
 import datetime
 from datetime import date
 
 
-class Branch():
+class Branch(GitHubUtils):
 
-    def __init__(self, GITHUB_TOKEN):
-        self.GITHUB_TOKEN = GITHUB_TOKEN
-        self.github_url = "https://api.github.com/repos/"
-        self.headers = {"Content-Type": "applications/json",
-                        "Authorization": "Bearer " +
-                        self.GITHUB_TOKEN}
+    def __init__(self, chat_id):
+        super().__init__(chat_id)
 
-    def get_branches_names(self, project_name, project_owner):
-
-        try:
-            branches_dict = {"branches": []}
-            response = requests.get(self.github_url + "{project_owner}/"
-                                    "{project_name}/branches".format(
-                                        project_owner=project_owner,
-                                        project_name=project_name),
-                                    headers=self.headers)
-            response.raise_for_status()
-            received_branches = response.json()
-        except HTTPError as http_error:
-            dict_error = {"status_code": http_error.response.status_code}
-            raise HTTPError(json.dumps(dict_error))
-        else:
-            for i, item in enumerate(received_branches):
-                branches_data = {"name": 0}
-                branches_data["name"] = received_branches[i]["name"]
-                branches_dict["branches"].append(branches_data)
-        return branches_dict
+    def get_branches_names(self, project_owner, project_name):
+        url = self.GITHUB_API_URL + self.project_owner_project_name(
+            project_owner, project_name, "branches")
+        requested_branches = self.request_url(url, "get")
+        project_branches = self.branches_requested_branches(requested_branches)
+        return project_branches
 
     def get_date_last_commit_branches(self,  project_name, project_owner):
-
-        try:
-            branches_dict = {"branches": []}
-            branches_names = self.get_branches_names(
-                             project_name, project_owner)
-            for i, branch_name in enumerate(branches_names["branches"]):
-                branches_data = {"name": 0, "last_commit_days": 0}
-                response = requests.get(self.github_url + "{project_owner}/"
-                                        "{project_name}/branches/"
+        branches_dict = {"branches": []}
+        branches_names = self.get_branches_names(
+            project_owner, project_name)
+        for i, branch_name in enumerate(branches_names["branches"]):
+            branches_data = {"name": 0, "last_commit_days": 0}
+            url = self.GITHUB_API_URL + "repos/{project_owner}/"\
+                                        "{project_name}/branches/"\
                                         "{branch_name}".format(
                                             project_owner=project_owner,
                                             project_name=project_name,
-                                            branch_name=branch_name["name"]),
-                                        headers=self.headers)
-                received_json = response.json()
-                branches_data["name"] = branch_name["name"]
-                commit_days = self.get_last_commit_days(
-                                            received_json["commit"]
-                                            ["commit"]["author"]["date"])
-                branches_data["last_commit_days"] = commit_days
-                branches_dict["branches"].append(branches_data)
-        except HTTPError as http_error:
-            dict_message = json.loads(str(http_error))
-            dict_error = {"status_code": dict_message["status_code"]}
-            raise HTTPError(json.dumps(dict_error))
-
-        else:
-            return branches_dict
+                                            branch_name=branch_name["name"])
+            requested_dates = self.request_url(url, "get")
+            branches_data["name"] = branch_name["name"]
+            commit_days = self.get_last_commit_days(
+                requested_dates["commit"]
+                ["commit"]["author"]["date"])
+            branches_data["last_commit_days"] = commit_days
+            branches_dict["branches"].append(branches_data)
+        return branches_dict
 
     def get_last_commit_days(self, branch_commit_date):
         todays_date = date.today()
@@ -73,3 +44,15 @@ class Branch():
         qntd_days = todays_date-commit_date
         commit_days = str(qntd_days.days)
         return commit_days
+
+    def branches_requested_branches(self, resp):
+        branches_dict = {"branches": []}
+        for i, item in enumerate(resp):
+            branches_data = {"name": 0}
+            self.update_branches_data(branches_data, branches_dict, resp, i)
+        return branches_dict
+
+    def update_branches_data(self, branches_data, branches_dict,
+                             resp, count):
+        branches_data["name"] = resp[count]["name"]
+        branches_dict["branches"].append(branches_data)
