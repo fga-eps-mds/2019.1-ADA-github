@@ -6,14 +6,30 @@ from github.tests.jsonschemas.branches.schemas import\
 from jsonschema import validate
 from github.branches.utils import Branch
 from requests.exceptions import HTTPError
+from jsonschema import validate
+from unittest.mock import patch, Mock
+from requests import Response
 
 
 class TestBranches(BaseTestCase):
     def setUp(self):
         super().setUp()
         self.branch = Branch(self.user.chat_id)
+        self.mocked_valid_response = Response()
+        mocked_content = [
+            {
+                "name": "master"
+             },
+            {
+                "name": "TEP"
+             }]
+        content_in_binary = json.dumps(mocked_content).encode('utf-8')
+        self.mocked_valid_response._content = content_in_binary
+        self.mocked_valid_response.status_code = 200
 
-    def test_utils_get_branches_names(self):
+    @patch('github.utils.github_utils.get')
+    def test_utils_get_branches_names(self, mocked_get):
+        mocked_get.return_value = self.mocked_valid_response
         project_owner = self.user.github_user
         project = self.user.project
         branches_name = self.branch.get_branches_names(project_owner,
