@@ -1,17 +1,18 @@
 import requests
 from requests.exceptions import HTTPError
+from github.utils.github_utils import GitHubUtils
 import json
 
 
-class ContributorIssues():
+class ContributorIssues(GitHubUtils):
 
-    def __init__(self, GITHUB_TOKEN):
-        self.GITHUB_TOKEN = GITHUB_TOKEN
+    def __init__(self, chat_id):
+        super().__init__(chat_id)
 
     def get_contributor_issues(self, repo_fullname, contributor_name):
         headers = {
             "Content-Type": "application/json",
-            "Authorization": "Bearer " + self.GITHUB_TOKEN
+            "Authorization": "Bearer " + self.GITHUB_API_TOKEN
         }
 
         try:

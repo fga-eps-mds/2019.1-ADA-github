@@ -1,8 +1,8 @@
 from flask import jsonify, Blueprint
 from flask_cors import CORS
 from github.contributor_issues.utils import ContributorIssues
-import json
-from github.issue.error_messages import NOT_FOUND, UNAUTHORIZED
+from github.find_project_collaborators.utils import FindProjectCollaborators
+from github.issue.error_messages import NOT_FOUND
 from requests.exceptions import HTTPError
 from github.data.user import User
 
@@ -16,15 +16,13 @@ def get_contributor_issues(chat_id, contributor_username):
     try:
         user = User.objects(chat_id=chat_id).first()
         project = user.project
-        contributor_issues = ContributorIssues(user.access_token)
+        project_collaborator = FindProjectCollaborators(chat_id)
+        full_name = project_collaborator.get_project(project.name)
+        contributor_issues = ContributorIssues(chat_id)
         issues = contributor_issues.\
-            get_contributor_issues(project.name, contributor_username)
+            get_contributor_issues(full_name, contributor_username)
     except HTTPError as http_error:
-        dict_message = json.loads(str(http_error))
-        if dict_message["status_code"] == 401:
-            return jsonify(UNAUTHORIZED), 401
-        else:
-            return jsonify(NOT_FOUND), 404
+        return contributor_issues.error_message(http_error)
     except AttributeError:
         return jsonify(NOT_FOUND), 404
     else:
