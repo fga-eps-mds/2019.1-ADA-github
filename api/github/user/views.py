@@ -72,3 +72,11 @@ def register_repository(chat_id):
         return jsonify({
             "status": "OK"
         }), 200
+
+@github_blueprint.route("/user/change_repo/<chat_id>",methods=["GET"])
+def change_repository(chat_id):
+    user = UserInfo(chat_id)
+    user_infos = user.get_own_user_data()
+    user.send_button_message(user_infos, chat_id)
+
+
