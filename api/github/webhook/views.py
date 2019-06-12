@@ -62,7 +62,7 @@ def webhook_notification(chat_id):
         dict_message = webhook.get_message_info(req_json)
         if req_json["action"] == "opened":
             if "pull_request" in list(req_json.keys()):  # new pr
-                message = "❕ *Novo pull request aberto* em "\
+                message = "❕ *Novo _pull_ _request_ aberto* em "\
                           "[{repo_name}#{pr_number} "\
                           "{title}]({pr_url})\n"\
                           "por [{user}]({user_url})\n"\
@@ -78,7 +78,7 @@ def webhook_notification(chat_id):
                                  parse_mode=telegram.ParseMode.MARKDOWN,
                                  disable_web_page_preview=True)
             elif "issue" in list(req_json.keys()):  # new issue
-                message = "❇ *Nova issue aberta* em "\
+                message = "❇ *Nova _issue_ aberta* em "\
                           "[{repo_name}#{issue_number} "\
                           "{title}]({issue_url})\n"\
                           "por [{user}]({user_url})."\
@@ -104,7 +104,7 @@ def webhook_notification(chat_id):
                           "{title}]({comment_url})\n"\
                           "por [{user}]({user_url})\n"\
                           "{comment_body}\n\n__Caso você queira comentar "\
-                          "essa issue, é só vc escrever: 'Comentar"\
+                          "essa _issue_, é só você escrever: 'Comentar"\
                           "#{issue_number} : e o comentário aqui'__"\
                           .format(repo_name=dict_message["repo_name"],
                                   issue_number=dict_message["number"],
@@ -123,13 +123,13 @@ def webhook_notification(chat_id):
                                     title=dict_message["title"],
                                     url=dict_message["url"])
                 if req_json["review"]["state"] == "approved":
-                    review_state = "✅ Pull request " + pull_request_name +\
+                    review_state = "✅ _Pull_ _request_ " + pull_request_name +\
                                    " aprovado"
                 elif req_json["review"]["state"] == "changes_requested":
                     review_state = " ❗️Mudanças solicitadas no pull request" +\
                                     " " + pull_request_name
                 else:
-                    review_state = "💬 Pull request " + pull_request_name +\
+                    review_state = "💬 _Pull_ _request_ " + pull_request_name +\
                                    "revisado"
                 message = review_state + " por [@{username}]({user_url})\n\n"\
                                          .format(username=dict_message["user"],
@@ -151,7 +151,7 @@ def webhook_notification(chat_id):
                                            [0]["html_url"]) + ")"
                 message = "📝 [{user}]({user_url}) "\
                           "solicitou a revisão de {reviewer} "\
-                          "no pull request "\
+                          "no _pull_ _request_ "\
                           "[{repo_name}#{pr_number}"\
                           "{title}]({pr_url})."\
                           .format(repo_name=dict_message["repo_name"],
@@ -162,7 +162,7 @@ def webhook_notification(chat_id):
                                   user=dict_message["user"],
                                   user_url=dict_message["user_url"])
                 bot.send_message(chat_id=chat_id, text=message,
-                                 parse_mode='Markdown',
+                                 parse_mode=telegram.ParseMode.MARKDOWN,
                                  disable_web_page_preview=True)
     except KeyError:
         return jsonify({
