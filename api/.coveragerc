@@ -1,0 +1,9 @@
+[run]
+omit =
+      */github/tests/*
+      */github/config.py
+
+[report]
+omit =
+      */github/tests/*
+      */github/config.py
