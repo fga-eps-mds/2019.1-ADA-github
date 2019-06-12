@@ -65,7 +65,7 @@ def webhook_notification(chat_id):
                 message = "❕ *Novo pull request aberto* em "\
                           "[{repo_name}#{pr_number} "\
                           "{title}]({pr_url})\n"\
-                          "por [{user}]({user_url})\n"\
+                          "por [{user}]({user_url})\n\n"\
                           "{pr_body}"\
                           .format(repo_name=dict_message["repo_name"],
                                   pr_number=dict_message["number"],
@@ -81,7 +81,10 @@ def webhook_notification(chat_id):
                 message = "❇ *Nova issue aberta* em "\
                           "[{repo_name}#{issue_number} "\
                           "{title}]({issue_url})\n"\
-                          "por [{user}]({user_url})."\
+                          "por [{user}]({user_url}).\n\n"\
+                          "_Caso você queira comentar "\
+                          "essa issue, é só você escrever: 'Comentar "\
+                          "#{issue_number}: e o comentário aqui'_"\
                           .format(repo_name=dict_message["repo_name"],
                                   issue_number=dict_message["number"],
                                   user=dict_message["user"],
@@ -103,8 +106,8 @@ def webhook_notification(chat_id):
                           "[{repo_name}#{issue_number} "\
                           "{title}]({comment_url})\n"\
                           "por [{user}]({user_url})\n"\
-                          "{comment_body}\n\n_Caso você queira comentar "\
-                          "essa issue, é só você escrever: 'Comentar"\
+                          "\n{comment_body}\n\n_Caso você queira comentar "\
+                          "essa issue, é só você escrever: 'Comentar "\
                           "#{issue_number}: e o comentário aqui'_"\
                           .format(repo_name=dict_message["repo_name"],
                                   issue_number=dict_message["number"],
