@@ -7,6 +7,7 @@ import requests
 import json
 import telegram
 import os
+import sys
 
 CLIENT_ID = os.getenv("GITHUB_OAUTH_CLIENT_ID", "")
 CLIENT_SECRET = os.getenv("GITHUB_OAUTH_CLIENT_SECRET", "")
@@ -55,7 +56,7 @@ class UserInfo(GitHubUtils):
         for repositorio in received_repositories["repositories"]:
             buttons.append(telegram.InlineKeyboardButton(
                     text=repositorio["name"],
-                    callback_data="meu repositorio do github é " +
+                    callback_data="hubrepo: " +
                                   repositorio["full_name"]))
         repo_names = [buttons[i:i+2] for i in range(0, len(buttons), 2)]
         return repo_names    
@@ -90,7 +91,9 @@ class UserInfo(GitHubUtils):
         bot = telegram.Bot(token=ACCESS_TOKEN)
         repo_names = self.select_repos_by_buttons(
                      user_infos["github_username"])
+        print(repo_names, file=sys.stderr)
         reply_markup = telegram.InlineKeyboardMarkup(repo_names)
+        print(reply_markup, file=sys.stderr)
         bot.send_message(chat_id=chat_id,
                          text="Encontrei esses repositórios na sua "
                          "conta do GitHub. Qual você quer que eu "
