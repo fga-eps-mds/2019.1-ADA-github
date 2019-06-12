@@ -6,8 +6,7 @@ from github.tests.jsonschemas.branches.schemas import\
 from jsonschema import validate
 from github.branches.utils import Branch
 from requests.exceptions import HTTPError
-from jsonschema import validate
-from unittest.mock import patch, Mock
+from unittest.mock import patch
 from requests import Response
 
 
