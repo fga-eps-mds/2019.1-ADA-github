@@ -32,10 +32,7 @@ class Project(mongoengine.Document):
         self.save()
         return self
 
-    def update_repository_infos(self, user, name):
-        self.project = Project.objects(user_id=user_id).first()
-        self.project.user_id = user.id
-        self.project.name = name
-        self.project.update()
-        return self.project
-
+    def update_repository_infos(self, name):
+        self.name = name
+        self.save()
+        return self

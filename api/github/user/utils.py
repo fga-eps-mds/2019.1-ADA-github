@@ -59,33 +59,26 @@ class UserInfo(GitHubUtils):
                     callback_data="hubrepo: " +
                                   repositorio["full_name"]))
         repo_names = [buttons[i:i+2] for i in range(0, len(buttons), 2)]
-        return repo_names    
-    
+        return repo_names
+
     def register_repo(self, repo_json):
         project_name = repo_json["repository_name"]
         chat_id = repo_json["chat_id"]
 
         user = User.objects(chat_id=chat_id).first()
-        if user.project == None :
-            try:
-                project = Project()
+        try:
+            project = Project()
+            if user.project is None:
                 project.save_repository_infos(user, project_name)
-                user.save_github_repo_data(project)
-            except AttributeError:
-                dict_error = {"message":
-                              "Tive um erro tentando cadastrar seu repositório. "
-                              "Mais tarde você tenta. Ok?"}
-                raise AttributeError(json.dumps(dict_error))
-        else:
-            try:
-                project=Project()
-                project.update_repository_infos(user, project_name)
-                user.save_github_repo_data(project)
-            except AttributeError:
-                dict_error = {"message":
-                              "Tive um erro tentando cadastrar seu repositório. "
-                              "Mais tarde você tenta. Ok?"}
-                raise AttributeError(json.dumps(dict_error))
+            else:
+                user.project.update_repository_infos(project_name)
+
+            user.save_github_repo_data(project)
+        except AttributeError:
+            dict_error = {"message":
+                          "Tive um erro tentando cadastrar seu repositório. "
+                          "Mais tarde você tenta. Ok?"}
+            raise AttributeError(json.dumps(dict_error))
 
     def send_button_message(self, user_infos, chat_id):
         bot = telegram.Bot(token=ACCESS_TOKEN)
