@@ -68,6 +68,8 @@ def register_repository(chat_id):
         user.register_repo(repo_name)
     except AttributeError:
         return jsonify(NOT_FOUND), 404
+    except HTTPError:
+        return repo_name.error_message(http_error)
     else:
         return jsonify({
             "status": "OK"
@@ -76,6 +78,13 @@ def register_repository(chat_id):
 
 @github_blueprint.route("/user/change_repo/<chat_id>", methods=["GET"])
 def change_repository(chat_id):
-    user = UserInfo(chat_id)
-    user_infos = user.get_own_user_data()
-    user.send_button_message(user_infos, chat_id)
+    try:
+        user = UserInfo(chat_id)
+        user_infos = user.get_own_user_data()
+        user.send_button_message(user_infos, chat_id)
+    except HTTPError as http_error:
+        return user.error_message(http_error)
+    else:
+        return jsonify({
+            "status": "OK"
+        }), 200
