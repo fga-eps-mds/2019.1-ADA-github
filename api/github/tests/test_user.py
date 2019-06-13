@@ -10,6 +10,7 @@ from jsonschema import validate
 from github.user.utils import UserInfo
 import os
 from requests import Response
+from github.user.utils import authenticate_access_token
 
 ACCESS_TOKEN = os.environ.get("ACCESS_TOKEN", "")
 GITHUB_API_TOKEN = os.environ.get("GITHUB_API_TOKEN", "")
@@ -20,7 +21,7 @@ class TestUser(BaseTestCase):
         super().setUp()
         self.user_info = UserInfo(self.user.chat_id)
         self.headers = {
-             "Content-Type": "application/json"
+            "Content-Type": "application/json"
         }
         get_repo_content = [
             {
@@ -114,6 +115,15 @@ class TestUser(BaseTestCase):
         self.assertEqual(response.status_code, 404)
         validate(data, user_json)
 
+    @patch('github.user.utils.post')
+    def test_authenticate_access_token(self, mocked_post):
+        mocked_response = Response()
+        mocked_content = {"access_token": "6321861256"}
+        content_in_binary = json.dumps(mocked_content).encode('utf-8')
+        mocked_response._content = content_in_binary
+        mocked_response.status_code = 200
+        mocked_post.return_value = mocked_response
+        authenticate_access_token("44456")
 
 if __name__ == "__main__":
     unittest.main()

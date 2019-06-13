@@ -7,6 +7,7 @@ import requests
 import json
 import telegram
 import os
+from requests import post
 
 CLIENT_ID = os.getenv("GITHUB_OAUTH_CLIENT_ID", "")
 CLIENT_SECRET = os.getenv("GITHUB_OAUTH_CLIENT_SECRET", "")
@@ -103,10 +104,10 @@ def authenticate_access_token(code):
                                  client_id=CLIENT_ID,
                                  client_secret=CLIENT_SECRET))
     data = json.dumps(data)
-    post = requests.post(url=url,
+    post_request = post(url=url,
                          headers=header,
                          data=data)
-    post_json = post.json()
+    post_json = post_request.json()
     GITHUB_TOKEN = post_json['access_token']
     return GITHUB_TOKEN
 
