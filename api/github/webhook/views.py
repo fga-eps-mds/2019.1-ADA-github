@@ -7,6 +7,7 @@ import json
 import os
 import telegram
 from telegram import Bot
+import telegram
 
 webhook_blueprint = Blueprint("webhook", __name__)
 CORS(webhook_blueprint)
