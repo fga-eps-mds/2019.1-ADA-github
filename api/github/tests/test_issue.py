@@ -48,7 +48,9 @@ class TestIssue(BaseTestCase):
         self.assertEqual(response.status_code, 200)
         validate(data, create_issue_json)
 
-    def test_view_comment_issue(self):
+    @patch('github.utils.github_utils.get')
+    def test_view_comment_issue(self, mocked_get):
+        mocked_get.return_value = self.mocked_valid_response
         response = self.client.post("/api/comment_issue/"
                                     "{chat_id}".format(
                                      chat_id=self.user.chat_id),
@@ -60,7 +62,9 @@ class TestIssue(BaseTestCase):
         self.assertEqual(response.status_code, 200)
         validate(data, comment_issue_json)
 
-    def test_view_create_issue_invalid_chat_id(self):
+    @patch('github.utils.github_utils.get')
+    def test_view_create_issue_invalid_chat_id(self, mocked_get):
+        mocked_get.return_value = self.response_not_found
         chat_id = "abcdefghij"
         response = self.client.post("/api/new_issue/"
                                     "{chat_id}".format(
@@ -73,7 +77,9 @@ class TestIssue(BaseTestCase):
         self.assertEqual(response.status_code, 404)
         validate(data, create_issue_json)
 
-    def test_view_create_issue_invalid_token(self):
+    @patch('github.utils.github_utils.get')
+    def test_view_create_issue_invalid_token(self, mocked_get):
+        mocked_get.return_value = self.response_unauthorized
         self.user.access_token = "wrong_token"
         self.user.save()
         response = self.client.post("/api/new_issue/"
@@ -100,7 +106,9 @@ class TestIssue(BaseTestCase):
         self.assertEqual(response.status_code, 404)
         validate(data, comment_issue_json)
 
-    def test_view_comment_issue_invalid_token(self):
+    @patch('github.utils.github_utils.get')
+    def test_view_comment_issue_invalid_token(self, mocked_get):
+        mocked_get.return_value = self.response_unauthorized
         self.user.access_token = "wrong_token"
         self.user.save()
         response = self.client.post("/api/comment_issue/"
