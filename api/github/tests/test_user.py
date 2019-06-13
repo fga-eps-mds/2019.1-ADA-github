@@ -1,5 +1,6 @@
 import json
 import unittest
+from unittest.mock import patch, Mock
 from github.tests.base import BaseTestCase
 from github.tests.jsonschemas.user.schemas import\
     view_get_access_token_schema,\
@@ -8,6 +9,7 @@ from github.tests.jsonschemas.user.schemas import\
 from jsonschema import validate
 from github.user.utils import UserInfo
 import os
+
 ACCESS_TOKEN = os.environ.get("ACCESS_TOKEN", "")
 GITHUB_API_TOKEN = os.environ.get("GITHUB_API_TOKEN", "")
 
@@ -20,7 +22,10 @@ class TestUser(BaseTestCase):
              "Content-Type": "application/json"
         }
 
-    def test_view_get_access_token(self):
+    @patch('github.user.utils.telegram')
+    def test_view_get_access_token(self, mocked_message):
+        mocked_message.return_value = Mock()
+        mocked_message.Bot.send_message = Mock()
         chat_id = self.user.chat_id
         response = self.client.get("/user/github/authorize/{chat_id}"
                                    .format(chat_id=chat_id))
