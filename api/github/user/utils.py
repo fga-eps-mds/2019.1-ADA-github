@@ -68,12 +68,14 @@ class UserInfo(GitHubUtils):
         user = User.objects(chat_id=chat_id).first()
         try:
             project = Project()
-            if user.project is None:
-                project.save_repository_infos(user, project_name)
+            if user.project:
+                project.save_repository_infos(user, str(project_name))                
+                user.project.update_repository_infos(str(project_name))
             else:
-                user.project.update_repository_infos(project_name)
+                project.save_repository_infos(user, str(project_name))
 
             user.save_github_repo_data(project)
+            print("###"*30 + "\n" + "SALVOU O USER" + "###"*30 + "\n", file=sys.stderr)
         except AttributeError:
             dict_error = {"message":
                           "Tive um erro tentando cadastrar seu repositório. "
