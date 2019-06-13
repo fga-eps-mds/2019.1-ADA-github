@@ -6,6 +6,7 @@ from github.data import init_db
 import os
 from github.data.user import User
 from github.data.project import Project
+from requests import Response
 
 
 class BaseTestCase(TestCase):
@@ -24,6 +25,10 @@ class BaseTestCase(TestCase):
         self.user.project = self.project
         self.user.save()
         self.GITHUB_API_TOKEN = os.getenv("GITHUB_API_TOKEN", "")
+        self.response_not_found = Response()
+        self.response_not_found.status_code = 404
+        self.response_unauthorized = Response()
+        self.response_unauthorized.status_code = 401
 
     def create_app(self):
         app = create_app()
