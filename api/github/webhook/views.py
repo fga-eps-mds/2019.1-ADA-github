@@ -6,6 +6,7 @@ from github.webhook.webhook_utils import Webhook
 import json
 import os
 from telegram import Bot
+import telegram
 
 webhook_blueprint = Blueprint("webhook", __name__)
 CORS(webhook_blueprint)
@@ -61,10 +62,10 @@ def webhook_notification(chat_id):
         dict_message = webhook.get_message_info(req_json)
         if req_json["action"] == "opened":
             if "pull_request" in list(req_json.keys()):  # new pr
-                message = "❕ **Novo pull request aberto** em "\
+                message = "❕ *Novo pull request aberto* em "\
                           "[{repo_name}#{pr_number} "\
                           "{title}]({pr_url})\n"\
-                          "por [{user}]({user_url})\n"\
+                          "por [{user}]({user_url})\n\n"\
                           "{pr_body}"\
                           .format(repo_name=dict_message["repo_name"],
                                   pr_number=dict_message["number"],
@@ -74,13 +75,16 @@ def webhook_notification(chat_id):
                                   user_url=dict_message["user_url"],
                                   pr_body=dict_message["body"])
                 bot.send_message(chat_id=chat_id, text=message,
-                                 parse_mode='Markdown',
+                                 parse_mode=telegram.ParseMode.MARKDOWN,
                                  disable_web_page_preview=True)
             elif "issue" in list(req_json.keys()):  # new issue
-                message = "❇ **Nova issue aberta** em "\
+                message = "❇ *Nova issue aberta* em "\
                           "[{repo_name}#{issue_number} "\
                           "{title}]({issue_url})\n"\
-                          "por [{user}]({user_url})."\
+                          "por [{user}]({user_url}).\n\n"\
+                          "_Caso você queira comentar "\
+                          "essa issue, é só você escrever: 'Comentar "\
+                          "#{issue_number}: e o comentário aqui'_"\
                           .format(repo_name=dict_message["repo_name"],
                                   issue_number=dict_message["number"],
                                   user=dict_message["user"],
@@ -88,7 +92,7 @@ def webhook_notification(chat_id):
                                   title=dict_message["title"],
                                   issue_url=dict_message["url"])
                 bot.send_message(chat_id=chat_id, text=message,
-                                 parse_mode='Markdown',
+                                 parse_mode=telegram.ParseMode.MARKDOWN,
                                  disable_web_page_preview=True)
         elif req_json["action"] == "created":
             if "pull_request_review_comment" in list(req_json.keys()):
@@ -98,13 +102,13 @@ def webhook_notification(chat_id):
                 # new issue comment
                 comment_url, comment_body = \
                     webhook.get_body_and_body_url(req_json)
-                message = "💬 **Novo comentário** em "\
+                message = "💬 *Novo comentário* em "\
                           "[{repo_name}#{issue_number} "\
                           "{title}]({comment_url})\n"\
                           "por [{user}]({user_url})\n"\
-                          "{comment_body}\n\n__Caso você queira comentar "\
-                          "essa issue, é só vc escrever: 'Comentar"\
-                          "#{issue_number} : e o comentário aqui'__"\
+                          "\n{comment_body}\n\n_Caso você queira comentar "\
+                          "essa issue, é só você escrever: 'Comentar "\
+                          "#{issue_number}: e o comentário aqui'_"\
                           .format(repo_name=dict_message["repo_name"],
                                   issue_number=dict_message["number"],
                                   user=dict_message["user"],
@@ -113,7 +117,7 @@ def webhook_notification(chat_id):
                                   comment_url=comment_url,
                                   comment_body=comment_body)
                 bot.send_message(chat_id=chat_id, text=message,
-                                 parse_mode='Markdown',
+                                 parse_mode=telegram.ParseMode.MARKDOWN,
                                  disable_web_page_preview=True)
         elif req_json["action"] == "submitted":
             if "review" in list(req_json.keys()):
@@ -161,7 +165,7 @@ def webhook_notification(chat_id):
                                   user=dict_message["user"],
                                   user_url=dict_message["user_url"])
                 bot.send_message(chat_id=chat_id, text=message,
-                                 parse_mode='Markdown',
+                                 parse_mode=telegram.ParseMode.MARKDOWN,
                                  disable_web_page_preview=True)
     except KeyError:
         return jsonify({
