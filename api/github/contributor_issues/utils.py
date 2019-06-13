@@ -8,7 +8,7 @@ class ContributorIssues(GitHubUtils):
 
     def get_contributor_issues(self, repo_fullname, contributor_name):
 
-        url = self.GITHUB_API_URL + "/repos/{repo_fullname}"\
+        url = self.GITHUB_API_URL + "repos/{repo_fullname}"\
               "/issues?assignee={contributor_name}"\
               .format(repo_fullname=repo_fullname,
                       contributor_name=contributor_name)

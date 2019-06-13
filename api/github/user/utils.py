@@ -3,7 +3,6 @@
 from github.data.user import User
 from github.data.project import Project
 from github.utils.github_utils import GitHubUtils
-import requests
 import json
 import telegram
 import os
@@ -105,8 +104,8 @@ def authenticate_access_token(code):
                                  client_secret=CLIENT_SECRET))
     data = json.dumps(data)
     post_request = post(url=url,
-                         headers=header,
-                         data=data)
+                        headers=header,
+                        data=data)
     post_json = post_request.json()
     GITHUB_TOKEN = post_json['access_token']
     return GITHUB_TOKEN

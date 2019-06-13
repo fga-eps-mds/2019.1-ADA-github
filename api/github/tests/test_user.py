@@ -43,12 +43,37 @@ class TestUser(BaseTestCase):
         self.mocked_valid_own_data = Response()
         self.mocked_valid_own_data._content = get_own_data_content_in_binary
         self.mocked_valid_own_data.status_code = 200
+        mocked_post_content = {
+            "access_token": "xyz789abc123"
+        }
+        mocked_post_content_in_binary = json.dumps(mocked_post_content).\
+            encode('utf-8')
+        self.mocked_post_valid = Response()
+        self.mocked_post_valid._content = mocked_post_content_in_binary
+        self.mocked_post_valid.status_code = 200
 
     @patch('github.user.utils.telegram')
     def test_view_get_access_token(self, mocked_message):
         mocked_message.return_value = Mock()
         mocked_message.Bot.send_message = Mock()
         chat_id = self.user.chat_id
+        response = self.client.get("/user/github/authorize/{chat_id}"
+                                   .format(chat_id=chat_id))
+        self.assertEqual(response.status_code, 302)
+
+    @patch('github.utils.github_utils.get')
+    @patch('github.user.utils.telegram')
+    @patch('github.user.utils.post')
+    def test_view_get_access_token_new_user(self, mocked_post,
+                                            mocked_message,
+                                            mocked_get):
+        mocked_get.side_effect = (self.mocked_valid_own_data,
+                                  self.mocked_valid_own_data,
+                                  self.mocked_valid_get_repo)
+        mocked_post.return_value = self.mocked_post_valid
+        mocked_message.return_value = Mock()
+        mocked_message.Bot.send_message = Mock()
+        chat_id = "1234567890"
         response = self.client.get("/user/github/authorize/{chat_id}"
                                    .format(chat_id=chat_id))
         self.assertEqual(response.status_code, 302)
@@ -124,6 +149,7 @@ class TestUser(BaseTestCase):
         mocked_response.status_code = 200
         mocked_post.return_value = mocked_response
         authenticate_access_token("44456")
+
 
 if __name__ == "__main__":
     unittest.main()
