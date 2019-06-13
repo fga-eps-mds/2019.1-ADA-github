@@ -9,6 +9,7 @@ from github.tests.jsonschemas.user.schemas import\
 from jsonschema import validate
 from github.user.utils import UserInfo
 import os
+from requests import Response
 
 ACCESS_TOKEN = os.environ.get("ACCESS_TOKEN", "")
 GITHUB_API_TOKEN = os.environ.get("GITHUB_API_TOKEN", "")
@@ -21,6 +22,26 @@ class TestUser(BaseTestCase):
         self.headers = {
              "Content-Type": "application/json"
         }
+        get_repo_content = [
+            {
+                "name": "mocked_user",
+                "full_name": "mocked_user/mocked_repo"
+            }
+        ]
+        get_repo_content_in_binary = json.dumps(get_repo_content).\
+            encode('utf-8')
+        self.mocked_valid_get_repo = Response()
+        self.mocked_valid_get_repo._content = get_repo_content_in_binary
+        self.mocked_valid_get_repo.status_code = 200
+        get_own_data_content = {
+            "login": "mocked_user",
+            "id": "123456789"
+        }
+        get_own_data_content_in_binary = json.dumps(
+            get_own_data_content).encode('utf-8')
+        self.mocked_valid_own_data = Response()
+        self.mocked_valid_own_data._content = get_own_data_content_in_binary
+        self.mocked_valid_own_data.status_code = 200
 
     @patch('github.user.utils.telegram')
     def test_view_get_access_token(self, mocked_message):
@@ -41,7 +62,10 @@ class TestUser(BaseTestCase):
         self.assertEqual(response.status_code, 302)
         validate(data, user_json)
 
-    def test_view_get_repos(self):
+    @patch('github.utils.github_utils.get')
+    def test_view_get_repos(self, mocked_get):
+        mocked_get.side_effect = (self.mocked_valid_own_data,
+                                  self.mocked_valid_get_repo)
         response = self.client.get("/user/repositories/{chat_id}"
                                    .format(chat_id=self.user.chat_id))
         data = json.loads(response.data.decode())

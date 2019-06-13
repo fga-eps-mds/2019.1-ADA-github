@@ -29,7 +29,7 @@ class TestWebhook(BaseTestCase):
             get_mocked_delete_hook_in_binary
         self.mocked_delete_hook.status_code = 200
 
-    @patch('github.utils.github_utils.post')
+    @patch('github.utils.github_utils.get')
     def test_view_delete_hook(self, mocked_post):
         mocked_post.return_value = self.mocked_delete_hook
         user_data = {
@@ -310,7 +310,9 @@ class TestWebhook(BaseTestCase):
         self.assertEqual(response.status_code, 404)
         validate(data, not_found_schema)
 
-    def test_view_delete_hook_http_eror(self):
+    @patch('github.utils.github_utils.get')
+    def test_view_delete_hook_http_error(self, mocked_get):
+        mocked_get.return_value = self.response_unauthorized
         self.user.access_token = "wrong_token"
         self.user.save()
         data = {

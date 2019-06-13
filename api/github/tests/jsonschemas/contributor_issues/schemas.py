@@ -19,3 +19,13 @@ get_invalid_contributor_issues_schema = {
         },
     "required": ["message"]
 }
+
+invalid_project_schema = {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "User response schema",
+    "type": "object",
+    "properties": {
+        "status_code": {"type": "integer"}
+    },
+    "required": ["status_code"]
+}
