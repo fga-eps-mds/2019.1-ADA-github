@@ -3,11 +3,10 @@ from github.webhook.webhook_utils import Webhook
 from github.data.user import User
 from github.data.project import Project
 from github.utils.github_utils import GitHubUtils
-import requests
 import json
 import telegram
 import os
-import sys
+from requests import post
 
 CLIENT_ID = os.getenv("GITHUB_OAUTH_CLIENT_ID", "")
 CLIENT_SECRET = os.getenv("GITHUB_OAUTH_CLIENT_SECRET", "")
@@ -86,9 +85,7 @@ class UserInfo(GitHubUtils):
         bot = telegram.Bot(token=ACCESS_TOKEN)
         repo_names = self.select_repos_by_buttons(
                      user_infos["github_username"])
-        print(repo_names, file=sys.stderr)
         reply_markup = telegram.InlineKeyboardMarkup(repo_names)
-        print(reply_markup, file=sys.stderr)
         bot.send_message(chat_id=chat_id,
                          text="Encontrei esses repositórios na sua "
                          "conta do GitHub. Qual você quer que eu "
@@ -112,10 +109,10 @@ def authenticate_access_token(code):
                                  client_id=CLIENT_ID,
                                  client_secret=CLIENT_SECRET))
     data = json.dumps(data)
-    post = requests.post(url=url,
-                         headers=header,
-                         data=data)
-    post_json = post.json()
+    post_request = post(url=url,
+                        headers=header,
+                        data=data)
+    post_json = post_request.json()
     GITHUB_TOKEN = post_json['access_token']
     return GITHUB_TOKEN
 
