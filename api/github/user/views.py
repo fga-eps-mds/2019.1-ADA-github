@@ -68,8 +68,6 @@ def register_repository(chat_id):
         user.register_repo(repo_name)
     except AttributeError:
         return jsonify(NOT_FOUND), 404
-    except HTTPError:
-        return repo_name.error_message(http_error)
     else:
         return jsonify({
             "status": "OK"
@@ -86,5 +84,5 @@ def change_repository(chat_id):
         return user.error_message(http_error)
     else:
         return jsonify({
-            "status": "OK"
-        }), 200
+                "status": "OK"
+            }), 200
