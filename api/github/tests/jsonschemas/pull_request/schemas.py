@@ -63,3 +63,16 @@ not_found_schema = {
         },
     "required": ["message", "status_code"]
 }
+
+create_pull_request_schema = {
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "User response schema",
+    "type": "object",
+    "properties": {
+            "title": {"type": "string"},
+            "body": {"type": "string"},
+            "head": {"type": "string"},
+            "base": {"type": "string"}
+        },
+    "required": ["title", "body", "head", "base"]
+}
