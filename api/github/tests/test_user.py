@@ -68,7 +68,6 @@ class TestUser(BaseTestCase):
                                             mocked_message,
                                             mocked_get):
         mocked_get.side_effect = (self.mocked_valid_own_data,
-                                  self.mocked_valid_own_data,
                                   self.mocked_valid_get_repo)
         mocked_post.return_value = self.mocked_post_valid
         mocked_message.return_value = Mock()
@@ -90,8 +89,7 @@ class TestUser(BaseTestCase):
 
     @patch('github.utils.github_utils.get')
     def test_view_get_repos(self, mocked_get):
-        mocked_get.side_effect = (self.mocked_valid_own_data,
-                                  self.mocked_valid_get_repo)
+        mocked_get.return_value = (self.mocked_valid_get_repo)
         response = self.client.get("/user/repositories/{chat_id}"
                                    .format(chat_id=self.user.chat_id))
         data = json.loads(response.data.decode())
