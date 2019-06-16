@@ -85,7 +85,10 @@ def webhook_notification(chat_id):
                           "por [{user}]({user_url}).\n\n"\
                           "_Caso você queira comentar "\
                           "essa issue, é só você escrever: 'Comentar "\
-                          "#{issue_number}: e o comentário aqui'_"\
+                          "#{issue_number}: e o comentário aqui'_ \n\n"\
+                          "_Ou você pode responder a essa notificação, por "\
+                          "meio de um_ *Reply* _, e escrever: 'Comentar: "\
+                          "e o comentário aqui'_."\
                           .format(repo_name=dict_message["repo_name"],
                                   issue_number=dict_message["number"],
                                   user=dict_message["user"],
