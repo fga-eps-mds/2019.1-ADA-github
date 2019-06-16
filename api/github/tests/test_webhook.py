@@ -2,6 +2,7 @@ import unittest
 from github.tests.base import BaseTestCase
 from github.webhook.webhook_utils import Webhook
 import os
+from requests import Response
 import json
 from github.tests.jsonschemas.webhooks.schemas import\
     set_webhook_schema, not_found_schema,\
@@ -20,13 +21,17 @@ class TestWebhook(BaseTestCase):
         self.headers = {
             "Content-Type": "applications/json"
         }
+        self.mocked_delete_hook = Response()
+        get_mocked_delete_hook = []
+        get_mocked_delete_hook_in_binary = json.\
+            dumps(get_mocked_delete_hook).encode('utf-8')
+        self.mocked_delete_hook._content = \
+            get_mocked_delete_hook_in_binary
+        self.mocked_delete_hook.status_code = 200
 
-    @patch('github.webhook.views.Bot')
-    @patch('github.utils.github_utils.post')
-    def test_view_delete_hook(self, mocked_post, mocked_bot):
-        mocked_bot.return_value = Mock()
-        mocked_bot.send_message = Mock()
-        mocked_post.response = {}
+    @patch('github.utils.github_utils.get')
+    def test_view_delete_hook(self, mocked_post):
+        mocked_post.return_value = self.mocked_delete_hook
         user_data = {
             "chat_id": self.user.chat_id,
             "owner": self.user.github_user,
@@ -305,7 +310,9 @@ class TestWebhook(BaseTestCase):
         self.assertEqual(response.status_code, 404)
         validate(data, not_found_schema)
 
-    def test_view_delete_hook_http_eror(self):
+    @patch('github.utils.github_utils.get')
+    def test_view_delete_hook_http_error(self, mocked_get):
+        mocked_get.return_value = self.response_unauthorized
         self.user.access_token = "wrong_token"
         self.user.save()
         data = {
