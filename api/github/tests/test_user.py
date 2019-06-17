@@ -140,6 +140,28 @@ class TestUser(BaseTestCase):
         self.assertEqual(response.status_code, 404)
         validate(data, user_json)
 
+    @patch('github.user.utils.telegram')
+    @patch('github.utils.github_utils.get')
+    def test_view_change_repository(self, mocked_get, mocked_message):
+        mocked_get.side_effect = (self.mocked_valid_own_data,
+                                  self.mocked_valid_own_data,
+                                  self.mocked_valid_get_repo)
+        mocked_message.return_value = Mock()
+        mocked_message.Bot.send_message = Mock()
+        response = self.client.get("/user/change_repo/{chat_id}"
+                                   .format(chat_id=self.user.chat_id))
+        self.assertEqual(response.status_code, 200)
+
+    @patch('github.user.utils.telegram')
+    @patch('github.utils.github_utils.get')
+    def test_view_change_repository_invalid(self, mocked_get, mocked_message):
+        mocked_get.return_value = self.response_unauthorized
+        mocked_message.return_value = Mock()
+        mocked_message.Bot.send_message = Mock()
+        response = self.client.get("/user/change_repo/{chat_id}"
+                                   .format(chat_id=self.user.chat_id))
+        self.assertEqual(response.status_code, 401)
+
     @patch('github.user.utils.post')
     def test_authenticate_access_token(self, mocked_post):
         mocked_response = Response()
