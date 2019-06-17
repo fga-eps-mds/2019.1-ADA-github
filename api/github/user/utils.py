@@ -17,6 +17,9 @@ ACCESS_TOKEN = os.getenv("ACCESS_TOKEN", "")
 class UserInfo(GitHubUtils):
     def __init__(self, chat_id):
         super().__init__(chat_id)
+        self.headers = {
+            "Content-Type": "application/json"
+        }
 
     def get_own_user_data(self):
         url = self.GITHUB_API_URL + "user?access_token="\
@@ -28,7 +31,10 @@ class UserInfo(GitHubUtils):
         return github_data
 
     def get_repositories(self):
-        url = self.GITHUB_API_URL + "user/repos"
+        requested_username = self.get_own_user_data()
+        username = requested_username["github_username"]
+        url = self.GITHUB_API_URL + "users/{login}/repos".format(
+                                     login=username)
         requested_repositories = self.request_url(url, "get")
         project_repositories = self.repository_requested_repository(
                                     requested_repositories)
