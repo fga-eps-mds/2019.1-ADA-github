@@ -47,10 +47,19 @@ class UserInfo(GitHubUtils):
         received_repositories = self.get_repositories()
         buttons = []
         for repositorio in received_repositories["repositories"]:
-            buttons.append(telegram.InlineKeyboardButton(
-                    text=repositorio["name"],
-                    callback_data="hubrepo: " +
-                                  repositorio["full_name"]))
+            usrname = repositorio["full_name"].split("/")
+            usrname = usrname[0]
+            if(usrname==user):
+                buttons.append(telegram.InlineKeyboardButton(
+                        text=repositorio["name"],
+                        callback_data="hubrepo: " +
+                                    repositorio["full_name"]))
+            else:
+                buttons.append(telegram.InlineKeyboardButton(
+                        text=repositorio["full_name"],
+                        callback_data="hubrepo: " +
+                                    repositorio["full_name"]))
+                
         repo_names = [buttons[i:i+2] for i in range(0, len(buttons), 2)]
         return repo_names
 
