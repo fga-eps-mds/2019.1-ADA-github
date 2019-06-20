@@ -28,7 +28,7 @@ class UserInfo(GitHubUtils):
         return github_data
 
     def get_repositories(self):
-        url = self.GITHUB_API_URL + "user/repos"
+        url = self.GITHUB_API_URL + "user/repos?affiliation=owner,collaborator"
         requested_repositories = self.request_url(url, "get")
         project_repositories = self.repository_requested_repository(
                                     requested_repositories)
@@ -49,17 +49,16 @@ class UserInfo(GitHubUtils):
         for repositorio in received_repositories["repositories"]:
             usrname = repositorio["full_name"].split("/")
             usrname = usrname[0]
-            if(usrname==user):
+            if(usrname == user):
                 buttons.append(telegram.InlineKeyboardButton(
                         text=repositorio["name"],
                         callback_data="hubrepo: " +
-                                    repositorio["full_name"]))
+                        repositorio["full_name"]))
             else:
                 buttons.append(telegram.InlineKeyboardButton(
                         text=repositorio["full_name"],
                         callback_data="hubrepo: " +
-                                    repositorio["full_name"]))
-                
+                        repositorio["full_name"]))
         repo_names = [buttons[i:i+2] for i in range(0, len(buttons), 2)]
         return repo_names
 
