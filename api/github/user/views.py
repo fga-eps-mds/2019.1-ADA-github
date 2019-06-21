@@ -72,7 +72,6 @@ def register_repository(chat_id):
             "status": "OK"
         }), 200
 
-
 @github_blueprint.route("/user/change_repo/<chat_id>", methods=["GET"])
 def change_repository(chat_id):
     try:
@@ -85,3 +84,13 @@ def change_repository(chat_id):
         return jsonify({
                 "status": "OK"
             }), 200
+        
+@github_blueprint.route("/user/infos/<chat_id>", methods=["GET"])
+def get_user_infos(chat_id):
+    dict_user = {"username": 0,
+                 "repository": 0}
+    user = User.objects(chat_id=chat_id).first()
+    if user:
+        dict_user["username"] = user.github_user
+        dict_user["repository"] = user.project.name
+    return jsonify(dict_user), 200
