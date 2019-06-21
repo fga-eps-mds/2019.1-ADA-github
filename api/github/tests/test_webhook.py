@@ -28,6 +28,19 @@ class TestWebhook(BaseTestCase):
         self.mocked_delete_hook._content = \
             get_mocked_delete_hook_in_binary
         self.mocked_delete_hook.status_code = 200
+        self.mocked_get_hooks_response = Response()
+        self.mocked_get_hooks_response.status_code = 200
+        sucess_mocked_get_hooks_response = [
+                                            {
+                                             "config": {
+                                              "url": "http://localhost:" +
+                                              "5015/github/"
+                                             },
+                                             "id": 123345}]
+        get_hooks_in_binary = json.\
+            dumps(sucess_mocked_get_hooks_response).encode('utf-8')
+        self.mocked_get_hooks_response._content = \
+            get_hooks_in_binary
 
     @patch('github.utils.github_utils.get')
     def test_view_delete_hook(self, mocked_post):
@@ -325,6 +338,23 @@ class TestWebhook(BaseTestCase):
         data = json.loads(response.data.decode())
         self.assertEqual(response.status_code, 401)
         validate(data, not_found_schema)
+
+    @patch('github.webhook.webhook_utils.os')
+    @patch('github.webhook.webhook_utils.delete')
+    @patch('github.utils.github_utils.get')
+    def test_delete_hook(self, mocked_get, mocked_delete,
+                         mocked_os):
+        owner = self.user.github_user
+        repo = self.project.name
+        github_url = "www.github.com"
+        webhook_url = "www.google.com.br"
+        mocked_os.environ.get.return_value = github_url
+        mocked_os.getenv.return_value = webhook_url
+        delete_hook = Response()
+        delete_hook.status_code = 200
+        mocked_get.return_value = self.mocked_get_hooks_response
+        mocked_delete.return_value = delete_hook
+        self.webhook.delete_hook(owner, repo)
 
 
 if __name__ == "__main__":
