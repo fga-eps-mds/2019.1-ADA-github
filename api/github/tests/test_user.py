@@ -6,7 +6,8 @@ from github.tests.jsonschemas.user.schemas import\
     view_get_access_token_schema,\
     view_get_repos_schema, invalid_view_get_repos_schema, \
     view_register_repository_schema,\
-    view_notfound_register_repository_schema, get_user_infos_schema
+    view_notfound_register_repository_schema, get_user_infos_schema,\
+    get_repo_name_schema
 from jsonschema import validate
 from github.user.utils import UserInfo
 import os
@@ -156,6 +157,27 @@ class TestUser(BaseTestCase):
         data = json.loads(response.data.decode())
         self.assertEqual(response.status_code, 200)
         validate(data, get_user_infos_schema)
+
+    @patch('github.utils.github_utils.get')
+    def test_views_get_repo_name(self, mocked_get):
+        project_name = "ada..."
+        mocked_get.return_value = self.mocked_valid_get_repo
+        response = self.client.get("/user/project/{project_name}/{chat_id}"
+                                   .format(project_name=project_name,
+                                           chat_id=self.user.chat_id))
+        data = json.loads(response.data.decode())
+        self.assertEqual(response.status_code, 200)
+        validate(data, get_repo_name_schema)
+
+    @patch('github.utils.github_utils.get')
+    def test_views_get_repo_name_http_error(self, mocked_get):
+        mocked_get.return_value = self.response_not_found
+        response = self.client.get("/user/project/{project_name}/{chat_id}"
+                                   .format(project_name=self.project.name,
+                                           chat_id=self.user.chat_id))
+        data = json.loads(response.data.decode())
+        self.assertEqual(response.status_code, 404)
+        validate(data, invalid_view_get_repos_schema)
 
 
 if __name__ == "__main__":
