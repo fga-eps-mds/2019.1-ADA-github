@@ -111,7 +111,9 @@ class TestUser(BaseTestCase):
         self.assertEqual(response.status_code, 404)
         validate(data, user_json)
 
-    def test_view_register_repository(self):
+    @patch('github.webhook.webhook_utils.delete')
+    @patch('github.utils.github_utils.get')
+    def test_view_register_repository(self, mocked_get, mocked_delete):
         data = {
             "repository_name": "eda",
             "chat_id": self.user.chat_id
