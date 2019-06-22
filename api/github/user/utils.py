@@ -7,7 +7,6 @@ import json
 import telegram
 import os
 from requests import post
-import sys
 
 CLIENT_ID = os.getenv("GITHUB_OAUTH_CLIENT_ID", "")
 CLIENT_SECRET = os.getenv("GITHUB_OAUTH_CLIENT_SECRET", "")
@@ -70,16 +69,12 @@ class UserInfo(GitHubUtils):
             project = Project()
             if user.project:
                 webhook = Webhook(chat_id)
-                
-                
                 webhook.delete_hook(user.github_user, project_name)
                 webhook.delete_hook(user.github_user, user.project.name)
                 project = user.project
                 project.update_repository_infos(str(project_name))
             else:
-                print("###"*30 + "\n" +"RODOU ELSE " + "###"*30 + "\n", file=sys.stderr)
                 project.save_repository_infos(user, str(project_name))
-                print("###"*30 + "\n" +"SALVOU" + "###"*30 + "\n", file=sys.stderr)
             user.save_github_repo_data(project)
         except AttributeError:
             dict_error = {"message":
