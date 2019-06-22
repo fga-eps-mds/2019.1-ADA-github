@@ -31,14 +31,7 @@ class UserInfo(GitHubUtils):
         return github_data
 
     def get_repositories(self):
-<<<<<<< HEAD
-        requested_username = self.get_own_user_data()
-        username = requested_username["github_username"]
-        url = self.GITHUB_API_URL + "users/{login}/repos".format(
-                                     login=username)
-=======
         url = self.GITHUB_API_URL + "user/repos?affiliation=owner,collaborator"
->>>>>>> devel
         requested_repositories = self.request_url(url, "get")
         project_repositories = self.repository_requested_repository(
                                     requested_repositories)
