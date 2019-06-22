@@ -33,8 +33,8 @@ class TestWebhook(BaseTestCase):
         sucess_mocked_get_hooks_response = [
                                             {
                                              "config": {
-                                              "url": "http://localhost:" +
-                                              "5015/github/"
+                                              "url": "http://20191-ada-github_api_1" +
+                                              ":5000/github/"
                                              },
                                              "id": 123345}]
         get_hooks_in_binary = json.\
