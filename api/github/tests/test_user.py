@@ -5,7 +5,8 @@ from github.tests.base import BaseTestCase
 from github.tests.jsonschemas.user.schemas import\
     view_get_access_token_schema,\
     view_get_repos_schema, invalid_view_get_repos_schema, \
-    view_register_repository_schema, view_notfound_register_repository_schema
+    view_register_repository_schema,\
+    view_notfound_register_repository_schema, get_user_infos_schema
 from jsonschema import validate
 from github.user.utils import UserInfo
 import os
@@ -147,6 +148,14 @@ class TestUser(BaseTestCase):
         mocked_response.status_code = 200
         mocked_post.return_value = mocked_response
         authenticate_access_token("44456")
+
+    def test_views_get_user_infos(self):
+        chat_id = self.user.chat_id
+        response = self.client.get("/user/infos/{chat_id}"
+                                   .format(chat_id=chat_id))
+        data = json.loads(response.data.decode())
+        self.assertEqual(response.status_code, 200)
+        validate(data, get_user_infos_schema)
 
 
 if __name__ == "__main__":
