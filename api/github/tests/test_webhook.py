@@ -12,6 +12,7 @@ from unittest.mock import patch, Mock
 
 ACCESS_TOKEN = os.environ.get("ACCESS_TOKEN", "")
 GITHUB_API_TOKEN = os.environ.get("GITHUB_API_TOKEN", "")
+WEBHOOK_URL_ENVIRONMENT = os. environ.get("WEBHOOK_URL_ENVIRONMENT", "")
 
 
 class TestWebhook(BaseTestCase):
@@ -30,12 +31,11 @@ class TestWebhook(BaseTestCase):
         self.mocked_delete_hook.status_code = 200
         self.mocked_get_hooks_response = Response()
         self.mocked_get_hooks_response.status_code = 200
+        url = WEBHOOK_URL_ENVIRONMENT
         sucess_mocked_get_hooks_response = [
                                             {
                                              "config": {
-                                              "url": "http://20191-ada" +
-                                              "-github_api_1" +
-                                              ":5000/github/"
+                                              "url": "{url}".format(url=url)
                                              },
                                              "id": 123345}]
         get_hooks_in_binary = json.\
