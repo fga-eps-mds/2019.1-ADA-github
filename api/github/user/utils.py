@@ -17,7 +17,6 @@ ACCESS_TOKEN = os.getenv("ACCESS_TOKEN", "")
 class UserInfo(GitHubUtils):
     def __init__(self, chat_id):
         super().__init__(chat_id)
-        headers = self.headers
 
     def get_own_user_data(self):
         url = self.GITHUB_API_URL + "user?access_token="\
