@@ -1,5 +1,5 @@
 # api/github/__init__.py
-
+from github.webhook.webhook_utils import Webhook
 from github.data.user import User
 from github.data.project import Project
 from github.utils.github_utils import GitHubUtils
@@ -28,7 +28,7 @@ class UserInfo(GitHubUtils):
         return github_data
 
     def get_repositories(self):
-        url = self.GITHUB_API_URL + "user/repos"
+        url = self.GITHUB_API_URL + "user/repos?affiliation=owner,collaborator"
         requested_repositories = self.request_url(url, "get")
         project_repositories = self.repository_requested_repository(
                                     requested_repositories)
@@ -65,7 +65,16 @@ class UserInfo(GitHubUtils):
         user = User.objects(chat_id=chat_id).first()
         try:
             project = Project()
-            project.save_repository_infos(user, project_name)
+            if user.project:
+                webhook = Webhook(chat_id)
+                webhook.delete_hook(user.github_user, project_name)
+                webhook.delete_hook(user.github_user, user.project.name)
+                project = user.project
+                project.update_repository_infos(str(project_name))
+            else:
+                webhook = Webhook(chat_id)
+                webhook.delete_hook(user.github_user, project_name)
+                project.save_repository_infos(user, str(project_name))
             user.save_github_repo_data(project)
         except AttributeError:
             dict_error = {"message":
