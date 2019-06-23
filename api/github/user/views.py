@@ -73,6 +73,20 @@ def register_repository(chat_id):
         }), 200
 
 
+@github_blueprint.route("/user/change_repo/<chat_id>", methods=["GET"])
+def change_repository(chat_id):
+    try:
+        user = UserInfo(chat_id)
+        user_infos = user.get_own_user_data()
+        user.send_button_message(user_infos, chat_id)
+    except HTTPError as http_error:
+        return user.error_message(http_error)
+    else:
+        return jsonify({
+                "status": "OK"
+            }), 200
+
+
 @github_blueprint.route("/user/infos/<chat_id>", methods=["GET"])
 def get_user_infos(chat_id):
     dict_user = {"username": 0,

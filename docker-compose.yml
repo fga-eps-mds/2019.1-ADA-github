@@ -25,6 +25,7 @@ services:
       - FLASK_APP=github/__init__.py
       - FLASK_ENV=development
       - APP_SETTINGS=github.config.DevelopmentConfig
+      - WEBHOOK_URL_ENVIRONMENT=${WEBHOOK_URL_ENVIRONMENT}
   mongo-github:
     image: mongo
     command: mongod --port 27009
