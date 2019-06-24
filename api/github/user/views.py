@@ -96,3 +96,18 @@ def get_user_infos(chat_id):
         dict_user["username"] = user.github_user
         dict_user["repository"] = user.project.name
     return jsonify(dict_user), 200
+
+
+@github_blueprint.route("/user/project/<repo_name>/<chat_id>", methods=["GET"])
+def get_repo_name(chat_id, repo_name):
+    try:
+        user = UserInfo(chat_id)
+        projects = user.get_repositories()
+        project_name = repo_name[:-3]
+        repository_name = user.compare_repository_name(project_name, projects)
+    except HTTPError as http_error:
+        return user.error_message(http_error)
+    else:
+        return jsonify({
+            "project_name": repository_name
+        }), 200
