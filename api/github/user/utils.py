@@ -48,11 +48,15 @@ class UserInfo(GitHubUtils):
         buttons = []
         for repositorio in received_repositories["repositories"]:
             repository_name = repositorio["full_name"]
+            if user in repositorio["full_name"]:
+                project_name = repositorio["name"]
+            else:
+                project_name = repositorio["full_name"]
             project_len = len(repository_name.encode('utf-8'))
             if project_len > 54:
                 repository_name = repository_name[:51] + "..."
             buttons.append(telegram.InlineKeyboardButton(
-                    text=repositorio["name"],
+                    text=project_name,
                     callback_data="hubrepo: " +
                                   repository_name))
         repo_names = [buttons[i:i+2] for i in range(0, len(buttons), 2)]
