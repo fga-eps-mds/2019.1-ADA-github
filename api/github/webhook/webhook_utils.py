@@ -38,16 +38,18 @@ class Webhook(GitHubUtils):
         hook = self.request_url(hook_url, "get")
         if len(hook):
             user_hooks_url = WEBHOOK_URL_ENVIRONMENT
+            hook_id = None
             for user_hooks in hook:
                 if user_hooks_url in user_hooks["config"]["url"]:
                     hook_id = user_hooks["id"]
-            delete_hook_url = "https://api.github.com/"\
-                              "repos/{owner}/{repo}/"\
-                              "hooks/{hook_id}".format(owner=owner,
-                                                       repo=repo,
-                                                       hook_id=hook_id)
-            req = delete(delete_hook_url, headers=self.headers)
-            req.raise_for_status()
+            if hook_id:
+                delete_hook_url = "https://api.github.com/"\
+                                "repos/{owner}/{repo}/"\
+                                "hooks/{hook_id}".format(owner=owner,
+                                                         repo=repo,
+                                                         hook_id=hook_id)
+                req = delete(delete_hook_url, headers=self.headers)
+                req.raise_for_status()
 
     def get_message_info(self, req_json):
         dict_message = {

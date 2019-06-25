@@ -115,7 +115,8 @@ class TestUser(BaseTestCase):
     def test_view_register_repository(self, mocked_get, mocked_delete):
         data = {
             "repository_name": "eda",
-            "chat_id": self.user.chat_id
+            "chat_id": self.user.chat_id,
+            "owner": "lucasfcm9"
         }
         data_json = json.dumps(data)
         response = self.client.post("/user/repo/{chat_id}"
@@ -130,7 +131,8 @@ class TestUser(BaseTestCase):
     def test_notfound_view_register_repository(self):
         data = {
             "repository_name": "eda",
-            "chat_id": "1234"
+            "chat_id": "1234",
+            "owner": "error"
         }
         data_json = json.dumps(data)
         response = self.client.post("/user/repo/{chat_id}"

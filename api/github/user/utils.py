@@ -64,6 +64,7 @@ class UserInfo(GitHubUtils):
 
     def register_repo(self, repo_json):
         project_name = repo_json["repository_name"]
+        owner = repo_json["owner"]
         chat_id = repo_json["chat_id"]
 
         user = User.objects(chat_id=chat_id).first()
@@ -71,13 +72,17 @@ class UserInfo(GitHubUtils):
             project = Project()
             if user.project:
                 webhook = Webhook(chat_id)
-                webhook.delete_hook(user.github_user, project_name)
+                webhook.delete_hook(owner, project_name)
                 webhook.delete_hook(user.github_user, user.project.name)
+                user.github_user = owner
+                user.save()
                 project = user.project
                 project.update_repository_infos(str(project_name))
             else:
                 webhook = Webhook(chat_id)
-                webhook.delete_hook(user.github_user, project_name)
+                webhook.delete_hook(owner, project_name)
+                user.github_user = owner
+                user.save()
                 project.save_repository_infos(user, str(project_name))
             user.save_github_repo_data(project)
         except AttributeError:
