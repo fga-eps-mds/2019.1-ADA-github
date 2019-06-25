@@ -34,7 +34,6 @@ def get_access_token(chat_id):
         db_user.github_user_id = str(user_infos["github_user_id"])
         db_user.save()
         user.send_button_message(user_infos, chat_id)
-
     redirect_uri = "https://t.me/{bot_name}".format(bot_name=BOT_NAME)
     return redirect(redirect_uri, code=302)
 
@@ -61,9 +60,9 @@ def get_repositories(chat_id):
 
 @github_blueprint.route("/user/repo/<chat_id>", methods=["POST"])
 def register_repository(chat_id):
-    repo_data = request.get_json()
-    repo_name = repo_data
     try:
+        repo_data = request.get_json()
+        repo_name = repo_data
         user = UserInfo(chat_id)
         user.register_repo(repo_name)
     except AttributeError:
@@ -71,4 +70,44 @@ def register_repository(chat_id):
     else:
         return jsonify({
             "status": "OK"
+        }), 200
+
+
+@github_blueprint.route("/user/change_repo/<chat_id>", methods=["GET"])
+def change_repository(chat_id):
+    try:
+        user = UserInfo(chat_id)
+        user_infos = user.get_own_user_data()
+        user.send_button_message(user_infos, chat_id)
+    except HTTPError as http_error:
+        return user.error_message(http_error)
+    else:
+        return jsonify({
+                "status": "OK"
+            }), 200
+
+
+@github_blueprint.route("/user/infos/<chat_id>", methods=["GET"])
+def get_user_infos(chat_id):
+    dict_user = {"username": 0,
+                 "repository": 0}
+    user = User.objects(chat_id=chat_id).first()
+    if user:
+        dict_user["username"] = user.github_user
+        dict_user["repository"] = user.project.name
+    return jsonify(dict_user), 200
+
+
+@github_blueprint.route("/user/project/<repo_name>/<chat_id>", methods=["GET"])
+def get_repo_name(chat_id, repo_name):
+    try:
+        user = UserInfo(chat_id)
+        projects = user.get_repositories()
+        project_name = repo_name[:-3]
+        repository_name = user.compare_repository_name(project_name, projects)
+    except HTTPError as http_error:
+        return user.error_message(http_error)
+    else:
+        return jsonify({
+            "project_name": repository_name
         }), 200

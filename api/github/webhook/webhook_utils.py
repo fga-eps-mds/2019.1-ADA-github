@@ -1,7 +1,10 @@
-import requests
+from requests import delete
 import os
 from github.utils.github_utils import GitHubUtils
+
+
 GITHUB_SERVICE_URL = os.environ.get("GITHUB_SERVICE_URL", "")
+WEBHOOK_URL_ENVIRONMENT = os.getenv("WEBHOOK_URL_ENVIRONMENT", "")
 
 
 class Webhook(GitHubUtils):
@@ -34,14 +37,19 @@ class Webhook(GitHubUtils):
                    "hooks".format(owner=owner, repo=repo)
         hook = self.request_url(hook_url, "get")
         if len(hook):
-            hook_id = hook[0]["id"]
-            delete_hook_url = "https://api.github.com/"\
-                              "repos/{owner}/{repo}/"\
-                              "hooks/{hook_id}".format(owner=owner,
-                                                       repo=repo,
-                                                       hook_id=hook_id)
-            req = requests.delete(delete_hook_url, headers=self.headers)
-            req.raise_for_status()
+            user_hooks_url = WEBHOOK_URL_ENVIRONMENT
+            hook_id = None
+            for user_hooks in hook:
+                if user_hooks_url in user_hooks["config"]["url"]:
+                    hook_id = user_hooks["id"]
+            if hook_id:
+                delete_hook_url = "https://api.github.com/"\
+                                "repos/{owner}/{repo}/"\
+                                "hooks/{hook_id}".format(owner=owner,
+                                                         repo=repo,
+                                                         hook_id=hook_id)
+                req = delete(delete_hook_url, headers=self.headers)
+                req.raise_for_status()
 
     def get_message_info(self, req_json):
         dict_message = {

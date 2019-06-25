@@ -1,13 +1,12 @@
 # api/github/__init__.py
-
+from github.webhook.webhook_utils import Webhook
 from github.data.user import User
 from github.data.project import Project
 from github.utils.github_utils import GitHubUtils
-import requests
 import json
 import telegram
 import os
-import sys
+from requests import post
 
 CLIENT_ID = os.getenv("GITHUB_OAUTH_CLIENT_ID", "")
 CLIENT_SECRET = os.getenv("GITHUB_OAUTH_CLIENT_SECRET", "")
@@ -18,9 +17,6 @@ ACCESS_TOKEN = os.getenv("ACCESS_TOKEN", "")
 class UserInfo(GitHubUtils):
     def __init__(self, chat_id):
         super().__init__(chat_id)
-        self.headers = {
-            "Content-Type": "application/json"
-        }
 
     def get_own_user_data(self):
         url = self.GITHUB_API_URL + "user?access_token="\
@@ -32,10 +28,7 @@ class UserInfo(GitHubUtils):
         return github_data
 
     def get_repositories(self):
-        requested_username = self.get_own_user_data()
-        username = requested_username["github_username"]
-        url = self.GITHUB_API_URL + "users/{login}/repos".format(
-                                     login=username)
+        url = self.GITHUB_API_URL + "user/repos?affiliation=owner,collaborator"
         requested_repositories = self.request_url(url, "get")
         project_repositories = self.repository_requested_repository(
                                     requested_repositories)
@@ -54,21 +47,43 @@ class UserInfo(GitHubUtils):
         received_repositories = self.get_repositories()
         buttons = []
         for repositorio in received_repositories["repositories"]:
+            repository_name = repositorio["full_name"]
+            if user in repositorio["full_name"]:
+                project_name = repositorio["name"]
+            else:
+                project_name = repositorio["full_name"]
+            project_len = len(repository_name.encode('utf-8'))
+            if project_len > 54:
+                repository_name = repository_name[:51] + "..."
             buttons.append(telegram.InlineKeyboardButton(
-                    text=repositorio["name"],
+                    text=project_name,
                     callback_data="hubrepo: " +
-                                  repositorio["full_name"]))
+                                  repository_name))
         repo_names = [buttons[i:i+2] for i in range(0, len(buttons), 2)]
         return repo_names
 
     def register_repo(self, repo_json):
         project_name = repo_json["repository_name"]
+        owner = repo_json["owner"]
         chat_id = repo_json["chat_id"]
 
         user = User.objects(chat_id=chat_id).first()
         try:
             project = Project()
-            project.save_repository_infos(user, project_name)
+            if user.project:
+                webhook = Webhook(chat_id)
+                webhook.delete_hook(owner, project_name)
+                webhook.delete_hook(user.github_user, user.project.name)
+                user.github_user = owner
+                user.save()
+                project = user.project
+                project.update_repository_infos(str(project_name))
+            else:
+                webhook = Webhook(chat_id)
+                webhook.delete_hook(owner, project_name)
+                user.github_user = owner
+                user.save()
+                project.save_repository_infos(user, str(project_name))
             user.save_github_repo_data(project)
         except AttributeError:
             dict_error = {"message":
@@ -80,14 +95,18 @@ class UserInfo(GitHubUtils):
         bot = telegram.Bot(token=ACCESS_TOKEN)
         repo_names = self.select_repos_by_buttons(
                      user_infos["github_username"])
-        print(repo_names, file=sys.stderr)
         reply_markup = telegram.InlineKeyboardMarkup(repo_names)
-        print(reply_markup, file=sys.stderr)
         bot.send_message(chat_id=chat_id,
                          text="Encontrei esses repositórios na sua "
                          "conta do GitHub. Qual você quer que eu "
                          "monitore? Clica nele!",
                          reply_markup=reply_markup)
+
+    def compare_repository_name(self, repository_name, repositories):
+        for repository in repositories["repositories"]:
+            if repository_name in repository["full_name"]:
+                return repository["full_name"]
+        return repository_name
 
 
 def authenticate_access_token(code):
@@ -106,10 +125,10 @@ def authenticate_access_token(code):
                                  client_id=CLIENT_ID,
                                  client_secret=CLIENT_SECRET))
     data = json.dumps(data)
-    post = requests.post(url=url,
-                         headers=header,
-                         data=data)
-    post_json = post.json()
+    post_request = post(url=url,
+                        headers=header,
+                        data=data)
+    post_json = post_request.json()
     GITHUB_TOKEN = post_json['access_token']
     return GITHUB_TOKEN
 
