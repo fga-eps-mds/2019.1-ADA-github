@@ -15,10 +15,10 @@ CORS(contributor_issues_blueprint)
 def get_contributor_issues(chat_id, contributor_username):
     try:
         user = User.objects(chat_id=chat_id).first()
+        contributor_issues = ContributorIssues(chat_id)
         project = user.project
         project_collaborator = FindProjectCollaborators(chat_id)
         full_name = project_collaborator.get_project(project.name)
-        contributor_issues = ContributorIssues(chat_id)
         issues = contributor_issues.\
             get_contributor_issues(full_name, contributor_username)
     except HTTPError as http_error:

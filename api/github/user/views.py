@@ -60,9 +60,9 @@ def get_repositories(chat_id):
 
 @github_blueprint.route("/user/repo/<chat_id>", methods=["POST"])
 def register_repository(chat_id):
-    repo_data = request.get_json()
-    repo_name = repo_data
     try:
+        repo_data = request.get_json()
+        repo_name = repo_data
         user = UserInfo(chat_id)
         user.register_repo(repo_name)
     except AttributeError:

@@ -81,3 +81,17 @@ class TestContributorIssues(BaseTestCase):
         data = json.loads(response.data.decode())
         self.assertEqual(response.status_code, 404)
         validate(data, get_invalid_contributor_issues_schema)
+
+    @patch('github.utils.github_utils.get')
+    def test_views_contributor_issues_invalid_token(self, mocked_get):
+        mocked_get.return_value = self.response_unauthorized
+        self.user.access_token = "wrong_token"
+        self.user.save()
+        response = self.client.get("/api/get_contributor_issues/"
+                                   "{chat_id}/{contributor_username}".format(
+                                       chat_id=self.user.chat_id,
+                                       contributor_username=self.user.
+                                       github_user))
+        data = json.loads(response.data.decode())
+        self.assertEqual(response.status_code, 401)
+        validate(data, invalid_project_schema)
